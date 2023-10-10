@@ -38,3 +38,7 @@ Env variables:
 Commands:
 - `npm run dev` runs server locally 
 - `npm run build` builds page to `dist` dir
+
+Dirs:
+- `public` won't be processed
+- `src` is processed
