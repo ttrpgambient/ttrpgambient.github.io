@@ -42,3 +42,7 @@ Commands:
 Dirs:
 - `public` won't be processed
 - `src` is processed
+
+Creating app in dropbox:
+- set redirect url to http://localhost:5173/
+- need dev app and release app
