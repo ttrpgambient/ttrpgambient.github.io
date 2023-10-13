@@ -112,10 +112,12 @@ export class TagsInput extends React.Component<TagsInputProps, TagsInputState> {
         if ( element.value === "" ) 
             return;
 
+        let value = element.value.toLowerCase();
+
         let tagsCount = this.allTags.length;
         for ( let tagID = 0; tagID < tagsCount; ++tagID ) {
             if ( !this.selectedTags.includes(tagID) ) {
-                if ( this.allTags[tagID].includes(element.value) ) {
+                if ( this.allTags[tagID].includes(value) ) {
                     this.currentSuggestions.push(tagID);
                 }
             }
@@ -160,22 +162,36 @@ export class TagsInput extends React.Component<TagsInputProps, TagsInputState> {
         this.updateCurrentSuggestions(element);
     }
 
-    eventSuggestionOnClick() {
+    findSuggestionID(element: HTMLLIElement): number {
+        let suggestionsChildren = this.suggestionsElement.current?.children;
+        let suggestionsCount = this.currentSuggestions.length;
+        for ( let suggestionID = 0; suggestionID < suggestionsCount; ++suggestionID) {
+            if ( suggestionsChildren?.item(suggestionID) === element )
+                return suggestionID;
+        }
+
+        return -1;
+    }
+
+    eventSuggestionOnClick(event: React.MouseEvent<HTMLLIElement>) {
         let element = this.inputElement.current;
         if (!element) 
             return;
         
-        element.value = this.allTags[this.currentSuggestions[this.state.selectedSuggestion]];
+        let selectedSuggestion = this.state.selectedSuggestion;
+        if ( selectedSuggestion === -1 ) {
+            selectedSuggestion = this.findSuggestionID(event.currentTarget);
+        }
+
+        element.value = this.allTags[this.currentSuggestions[selectedSuggestion]];
         this.updateCurrentSuggestions(element);
         element.focus();
     }
 
     eventSuggestionMouseEnter(event: React.MouseEvent<HTMLLIElement>) {
-        let suggestionsChildren = this.suggestionsElement.current?.children;
-        let suggestionsCount = this.currentSuggestions.length;
-        for ( let suggestionID = 0; suggestionID < suggestionsCount; ++suggestionID) {
-            if ( suggestionsChildren?.item(suggestionID) === event.currentTarget )
-                this.selectSuggestion(suggestionID);
+        let suggestionID = this.findSuggestionID(event.currentTarget);
+        if ( suggestionID !== -1 ) {
+            this.selectSuggestion(suggestionID);
         }
     }
 
