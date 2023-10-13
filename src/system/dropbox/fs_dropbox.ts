@@ -36,6 +36,7 @@ function HandleDownloadError(path: string, downloadError: DropboxAPI.files.Downl
                 }
                 throw error;
             }
+            return FileSystemStatus.Unknown;
         default:
             throw DropboxError('Unsupported DownloadError type. File: ' + path);
     }
@@ -54,6 +55,7 @@ function HandleGetMetadataError(path: string, getMetadataError: DropboxAPI.files
     switch (getMetadataError['.tag']) {
         case 'path': //DownloadErrorPath
             HandleLookupError(path, getMetadataError.path);
+            break;
         default:
             throw DropboxError('Unsupported GetMetadataError type. File: ' + path);
     }
