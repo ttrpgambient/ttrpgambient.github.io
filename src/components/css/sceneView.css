@@ -1,0 +1,24 @@
+.scene-view-container{
+    border: 2px solid #000;
+    border-radius: 3px;
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.scene-view-title{
+    width: 100%;
+    margin-left: 10px;
+    font-size: large;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.scene-view-img{
+    border: 5px solid #000;
+    width:10%;
+    height: auto;
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}

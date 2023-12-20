@@ -1,13 +1,16 @@
 import './css/App.css'
 import './components/tagsInput'
 import { TagsInput } from './components/tagsInput'
+import { SceneView } from './components/sceneView'
 
 
 function App() {
   return (
-    <div className="App">
-      <h2>Enter Some Tags ...</h2>
-      <TagsInput/>
+    <div className="main-container">
+      <div> Display </div>
+      <div className='main-controls'>
+        <SceneView/>
+      </div>
     </div>
   )
 }
