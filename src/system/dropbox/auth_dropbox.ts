@@ -77,4 +77,15 @@ export class DropboxAuth implements Authenticate {
             throw DropboxError('Login() failed');
         }
     }
+
+    async Logout(): Promise<void> {
+        if (!!!this.dbx) {
+            throw DropboxError('Logout: no Dropbox object!');
+        }
+
+        let response = await this.dbx.authTokenRevoke();
+        if (!!!response) {
+            throw DropboxError('Logout failed');
+        }
+    }
 }
