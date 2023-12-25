@@ -9,3 +9,8 @@
     left: 50%; 
     z-index: 9;
   }
+
+  .image-manager-view {
+    display: grid;
+    grid-template-columns: 60% 40%;
+  }

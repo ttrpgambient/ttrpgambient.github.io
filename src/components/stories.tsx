@@ -24,9 +24,9 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
 
     return (
         <div>
-            <div className='settings-bar'>
-                <button type='button' className='settings-button' onClick={handleLogOutClick}>Log Out</button> 
-                <button type='button' className='settings-button' onClick={handleImageManagerClick}>Image Manager</button>
+            <div className='stories-settings-bar'>
+                <button type='button' className='stories-settings-button' onClick={handleLogOutClick}>Log Out</button> 
+                <button type='button' className='stories-settings-button' onClick={handleImageManagerClick}>Image Manager</button>
             </div>
             <div className='stories-main-container'>
                 <div className='stories-display-container'>Display</div>
