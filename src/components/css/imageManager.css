@@ -1,0 +1,13 @@
+.image-manager-container {
+    display: block;
+    position: fixed;
+    width: 70%;
+    height: 70%;
+    transform-origin: center;
+    translate: -50% 0%;
+    top: 15%;
+    left: 50%; 
+    border: 3px solid #000000;
+    background-color: #555555;
+    z-index: 9;
+  }

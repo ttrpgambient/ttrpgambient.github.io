@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import './css/App.css'
 import { TagsInput } from './components/tagsInput'
+import { ImageManager } from './components/imageManager';
 import { LoginPopup } from './components/loginPopup';
 import { WelcomeScreen } from './components/welcomeScreen';
 import { Stories } from './components/stories';
@@ -13,6 +14,7 @@ const AUTH_LOGOUT = 2;
 
 function App() {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [showImageManager, setShowImageManager] = useState(false);
   const [authButtonState, setAuthButtonState] = useState(AUTH_DISABLED);
 
   const handleLogInClick = () => {
@@ -24,6 +26,10 @@ function App() {
       authGlobal.logout().then( () => { setAuthButtonState(AUTH_LOGIN) } );
     }
   };
+
+  const handleImageManagerClick = () => {
+    setShowImageManager(!showImageManager)
+  }
 
   useEffect(() => {
     if (authButtonState === AUTH_DISABLED) {
@@ -37,7 +43,12 @@ function App() {
     if ( authButtonState !== AUTH_LOGOUT ) {
       return <button type='button' onClick={handleLogInClick} disabled = {authButtonState == AUTH_DISABLED}>Log In</button>
     }
-      return <button type='button' onClick={handleLotOutClick}>Log Out </button>
+      return (
+        <div className='settings-bar'>
+          <button type='button' className='settings-button' onClick={handleLotOutClick}>Log Out</button> 
+          <button type='button' className='settings-button' onClick={handleImageManagerClick}>Image Manager</button>
+        </div>
+      )
   }
 
   function Content() {
@@ -51,9 +62,10 @@ function App() {
     <div className="main-container">
       <div className='main-controls'>
         <LogButton/>
-        <LoginPopup onClose={handleLogInClick} isVisible={showLoginPopup}/>
       </div>
       <Content/>
+      <LoginPopup onClose={handleLogInClick} isVisible={showLoginPopup}/>
+      <ImageManager onClose={handleImageManagerClick} isVisible={showImageManager}/>
     </div>
   )
 }

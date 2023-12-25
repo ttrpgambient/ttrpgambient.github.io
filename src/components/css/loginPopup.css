@@ -12,12 +12,6 @@
     z-index: 9;
   }
 
-.login-popup-close {
-    position: relative;
-    float: right;
-    top: 0%;
-}
-
 .login-popup-buttons-container {
     margin: 20%;
     left: 100%;
