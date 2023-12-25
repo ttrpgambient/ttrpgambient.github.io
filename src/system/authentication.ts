@@ -7,6 +7,11 @@ export const SYSTEM_NAME = 'auth_system';
 const ACCESS_TOKEN = 'auth_access_token';
 const REFRESH_TOKEN = 'auth_refresh_token';
 
+export const AUTH_DISABLED = 0;
+export const AUTH_LOGIN = 1;
+export const AUTH_LOGOUT = 2;
+
+
 class Authentication {
 
     getSystemName(): string | null {
