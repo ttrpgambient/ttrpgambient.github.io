@@ -1,11 +1,8 @@
 .main-container {
   width: 100%;
-  display: grid;
-  grid-template-columns: 50% 50%;
-  gap: 10px;
+  height: 100%;
 }
 
 .main-controls {
   width: 100%;
-
 }

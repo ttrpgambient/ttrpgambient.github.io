@@ -2,13 +2,21 @@
     display: block;
     position: fixed;
     width: 300px;
-    height: auto;   
-    top: 15%; 
+    height: auto;
+    transform-origin: center;
     translate: -50% 0%;
+    top: 15%;
+    left: 50%; 
     border: 3px solid #000000;
     background-color: #555555;
     z-index: 9;
   }
+
+.login-popup-close {
+    position: relative;
+    float: right;
+    top: 0%;
+}
 
 .login-popup-buttons-container {
     margin: 20%;

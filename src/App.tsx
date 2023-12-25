@@ -3,6 +3,7 @@ import './css/App.css'
 import { TagsInput } from './components/tagsInput'
 import { SceneView } from './components/sceneView'
 import { LoginPopup } from './components/loginPopup';
+import { WelcomeScreen } from './components/welcomeScreen';
 
 import { authGlobal } from './system/authentication';
 
@@ -14,11 +15,13 @@ function App() {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [authButtonState, setAuthButtonState] = useState(AUTH_DISABLED);
 
-  const handleClick = () => {
+  const handleLogInClick = () => {
+    setShowLoginPopup(!showLoginPopup)
+  }
+
+  const handleLotOutClick = () => {
     if ( authButtonState == AUTH_LOGOUT ) {
       authGlobal.logout().then( () => { setAuthButtonState(AUTH_LOGIN) } );
-    } else {
-      setShowLoginPopup(true)
     }
   };
 
@@ -30,13 +33,20 @@ function App() {
     }
   }, [authButtonState]); 
 
+  function LogButton() {
+    if ( authButtonState !== AUTH_LOGOUT ) {
+      return <button type='button' onClick={handleLogInClick} disabled = {authButtonState == AUTH_DISABLED}>Log In</button>
+    }
+      return <button type='button' onClick={handleLotOutClick}>Log Out </button>
+  }
+
   return (
     <div className="main-container">
-      <div> Display </div>
       <div className='main-controls'>
-        <button type='button' onClick={handleClick} disabled = {authButtonState == AUTH_DISABLED}>Log {authButtonState == AUTH_LOGOUT ? "Out" : "In"} </button>
-        <LoginPopup isVisible={showLoginPopup}/>
+        <LogButton/>
+        <LoginPopup onClose={handleLogInClick} isVisible={showLoginPopup}/>
       </div>
+      <WelcomeScreen/>
     </div>
   )
 }

@@ -7,20 +7,22 @@ import './css/loginPopup.css';
 import { Dropbox } from '../system/dropbox/dropbox';
 
 type Props = {
+    onClose: () => void;
     isVisible: boolean;
 }
 
-export const LoginPopup: FunctionComponent<Props> = ({ isVisible }) => {
-    var visibility = isVisible ? "block" : "none";
+export const LoginPopup: FunctionComponent<Props> = ({onClose, isVisible }) => {
+    const visibility = isVisible ? "block" : "none";
 
     function DropboxLogIn() {
         window.localStorage.setItem(SYSTEM_NAME, DROPBOX_APP);
-        var dropbox = new Dropbox();
+        const dropbox = new Dropbox();
         dropbox.auth.RequestLogin();
     }
 
     return (
         <div className="login-popup-container" style={{display: visibility}}>
+            <button type="button" className='login-popup-close' onClick={onClose}>X</button>
             <div className="login-popup-buttons-container">
                 <button type="button" className='login-popup-button' onClick={DropboxLogIn}>Dropbox</button><br/>
                 <button type="button" className='login-popup-button'>Google Drive</button>
