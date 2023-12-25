@@ -1,9 +1,9 @@
 import {useState, useEffect} from 'react';
 import './css/App.css'
 import { TagsInput } from './components/tagsInput'
-import { SceneView } from './components/sceneView'
 import { LoginPopup } from './components/loginPopup';
 import { WelcomeScreen } from './components/welcomeScreen';
+import { Stories } from './components/stories';
 
 import { authGlobal } from './system/authentication';
 
@@ -40,13 +40,20 @@ function App() {
       return <button type='button' onClick={handleLotOutClick}>Log Out </button>
   }
 
+  function Content() {
+    if ( authButtonState === AUTH_LOGOUT ) {
+      return <Stories/>
+    }
+      return <WelcomeScreen/>
+  }
+
   return (
     <div className="main-container">
       <div className='main-controls'>
         <LogButton/>
         <LoginPopup onClose={handleLogInClick} isVisible={showLoginPopup}/>
       </div>
-      <WelcomeScreen/>
+      <Content/>
     </div>
   )
 }
