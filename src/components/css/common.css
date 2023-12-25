@@ -3,3 +3,8 @@
     float: right;
     top: 0%;
 }
+
+.default-theme {
+    border: 3px solid #000000;
+    background-color: #555555;
+}
