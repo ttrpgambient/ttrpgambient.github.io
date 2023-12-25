@@ -1,27 +1,23 @@
 .login-popup-container {
     display: block;
     position: fixed;
-    bottom: 50%;
-    right: 50%;
-    width: 10%;
-    height: 30%;
+    width: 300px;
+    height: auto;   
+    top: 15%; 
+    translate: -50% 0%;
     border: 3px solid #000000;
     background-color: #555555;
     z-index: 9;
-    align-items: center;
   }
 
 .login-popup-buttons-container {
-    margin-top: 20%;
-    position:relative;
-    left: 50%;
+    margin: 20%;
+    left: 100%;
     height: 100%;
 }
 
 .login-popup-button {
-    margin: 5px;
-    transform: translateX(-50%);
-    width: 70%;
-    min-height: 15%;
-    height: auto;
+    margin: 2px;
+    width: 100%;
+    height: 60px;
 }

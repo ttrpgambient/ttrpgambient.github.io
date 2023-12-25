@@ -28,7 +28,7 @@ function App() {
         setAuthButtonState(loggedIn ? AUTH_LOGOUT : AUTH_LOGIN);
       });
     }
-  }, [/*authButtonState*/]); 
+  }, [authButtonState]); 
 
   return (
     <div className="main-container">

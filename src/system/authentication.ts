@@ -21,10 +21,6 @@ class Authentication {
         return window.localStorage.getItem(REFRESH_TOKEN);
     }
 
-    private credentialsExist(): boolean {
-        return this.getAccessToken() != null && this.getRefreshToken() != null;
-    }
-
     async logout(): Promise<void> {
         await appGlobals.system?.getAuth().Logout();
         window.localStorage.removeItem(SYSTEM_NAME);
