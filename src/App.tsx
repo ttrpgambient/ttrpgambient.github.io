@@ -21,7 +21,7 @@ function App() {
     setShowLoginPopup(!showLoginPopup)
   }
 
-  const handleLotOutClick = () => {
+  const handleLogOutClick = () => {
     if ( authButtonState == AUTH_LOGOUT ) {
       authGlobal.logout().then( () => { setAuthButtonState(AUTH_LOGIN) } );
     }
@@ -45,7 +45,7 @@ function App() {
     }
       return (
         <div className='settings-bar'>
-          <button type='button' className='settings-button' onClick={handleLotOutClick}>Log Out</button> 
+          <button type='button' className='settings-button' onClick={handleLogOutClick}>Log Out</button> 
           <button type='button' className='settings-button' onClick={handleImageManagerClick}>Image Manager</button>
         </div>
       )
