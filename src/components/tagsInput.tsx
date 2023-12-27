@@ -9,25 +9,12 @@ class TagsInputProps { }
 const allTags: string[] = ['test0', 'test1', 'test2'];
 
 export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputProps) => {
-    const [tagsVersion, setTagsVersion] = useState(0);
     const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
-    const [suggestionsVersion, setSuggestionsVersion] = useState(0);
-
-    //keep between renders
-    const selectedTags = useRef< number[]>( [0, 2] );
-    const currentSuggestions = useRef<number[]>( []);
-    const suggestionsFocused = useRef<boolean>(false);
+    const [selectedTags, setSelectedTags] = useState< number[]>( [0, 2] );
+    const [currentSuggestions, setCurrentSuggestions] = useState<number[]>([]);
 
     const inputElement = useRef<HTMLInputElement>(null);
     const suggestionsElement = useRef<HTMLUListElement>(null);
-
-    const updateTagsVersion = () => {
-        setTagsVersion(tagsVersion + 1);
-    };
-
-    const updateSuggestionsVersion = () => {
-        setSuggestionsVersion(suggestionsVersion + 1);
-    };
 
     const addTag = (value: string): boolean => {
         if (!value.trim()) return false;
@@ -39,21 +26,15 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
             // new tag
             tagID = allTags.push(value) - 1;
         } else {
-            if (selectedTags.current.includes(tagID)) return false;
+            if (selectedTags.includes(tagID)) return false;
         }
 
-        selectedTags.current.push(tagID);
-        updateTagsVersion();
-
+        setSelectedTags( (prevSelectedTags) => { return [...prevSelectedTags, tagID] } );
         return true;
     };
 
-    const selectSuggestion = (suggestionID: number) => {
-        setSelectedSuggestion(suggestionID);
-    };
-
     const handleSuggestionsOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        const currentSuggestionsCount = currentSuggestions.current.length;
+        const currentSuggestionsCount = currentSuggestions.length;
         if (currentSuggestionsCount === 0) return;
 
         let currentSelectedSuggestion = selectedSuggestion;
@@ -73,36 +54,30 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
             currentSelectedSuggestion = 0;
         }
 
-        suggestionsFocused.current = true;
-
-        selectSuggestion(currentSelectedSuggestion);
+        setSelectedSuggestion(currentSelectedSuggestion);
     };
 
     const updateCurrentSuggestions = (element: HTMLInputElement) => {
-        suggestionsFocused.current = false;
-        currentSuggestions.current.length = 0;
-
-        if (element.value === '') return;
-
-        const value = element.value.toLowerCase();
-
-        const tagsCount = allTags.length;
-        for (let tagID = 0; tagID < tagsCount; ++tagID) {
-            if (!selectedTags.current.includes(tagID)) {
-                if (allTags[tagID].includes(value)) {
-                    currentSuggestions.current.push(tagID);
+        let tmpCurrentSuggestions: number[] = [];
+        if (element.value !== '') {
+            const value = element.value.toLowerCase();
+            
+            const tagsCount = allTags.length;
+            for (let tagID = 0; tagID < tagsCount; ++tagID) {
+                if (!selectedTags.includes(tagID)) {
+                    if (allTags[tagID].includes(value)) {
+                        tmpCurrentSuggestions.push(tagID);
+                    }
                 }
             }
         }
-
-        updateSuggestionsVersion();
-        selectSuggestion(-1);
+        setSelectedSuggestion(-1);
+        setCurrentSuggestions(tmpCurrentSuggestions);
     };
 
     // Events
     const eventRemoveTag = (index: number) => {
-        selectedTags.current.splice(index, 1);
-        updateTagsVersion();
+        setSelectedTags( prevSelectedTags => prevSelectedTags.filter((element, id) => id !== index) );
     };
 
     const eventOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -113,8 +88,8 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
             event.preventDefault();
             return;
         } else if (event.key === 'Enter') {
-            if (suggestionsFocused.current) {
-                element.value = allTags[currentSuggestions.current[selectedSuggestion]];
+            if (selectedSuggestion !== -1) {
+                element.value = allTags[currentSuggestions[selectedSuggestion]];
                 updateCurrentSuggestions(element);
             } else {
                 if (addTag(element.value)) {
@@ -135,7 +110,7 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
 
     const findSuggestionID = (element: HTMLLIElement): number => {
         const suggestionsChildren = suggestionsElement.current?.children;
-        const suggestionsCount = currentSuggestions.current.length;
+        const suggestionsCount = currentSuggestions.length;
         for (let suggestionID = 0; suggestionID < suggestionsCount; ++suggestionID) {
             if (suggestionsChildren?.item(suggestionID) === element) return suggestionID;
         }
@@ -152,7 +127,7 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
             currentSelectedSuggestion = findSuggestionID(event.currentTarget);
         }
 
-        element.value = allTags[currentSuggestions.current[currentSelectedSuggestion]];
+        element.value = allTags[currentSuggestions[currentSelectedSuggestion]];
         updateCurrentSuggestions(element);
         element.focus();
     };
@@ -160,14 +135,14 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
     const eventSuggestionMouseEnter = (event: React.MouseEvent<HTMLLIElement>) => {
         const suggestionID = findSuggestionID(event.currentTarget);
         if (suggestionID !== -1) {
-            selectSuggestion(suggestionID);
+            setSelectedSuggestion(suggestionID);
         }
     };
 
     // Render
     const renderSuggestions = (): React.ReactNode => (
         <ul ref={suggestionsElement} className="tags-suggestions">
-            {currentSuggestions.current.map((suggestionID, index) => {
+            {currentSuggestions.map((suggestionID, index) => {
                 let className;
                 // Flag the active suggestion with a class
                 if (index === selectedSuggestion) {
@@ -192,7 +167,7 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
     return (
         <div>
             <div className="tags-input-container">
-                {selectedTags.current.map((tagID, index) => (
+                {selectedTags.map((tagID, index) => (
                     <div className="tag-item" key={index}>
                         <span className="text">{allTags[tagID]}</span>
                         <span className="close" onClick={() => eventRemoveTag(index)}>
