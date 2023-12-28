@@ -77,7 +77,7 @@ export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputPro
 
     // Events
     const eventRemoveTag = (index: number) => {
-        setSelectedTags( prevSelectedTags => prevSelectedTags.filter((element, id) => id !== index) );
+        setSelectedTags( prevSelectedTags => [...prevSelectedTags.slice(0, index), ...prevSelectedTags.slice(index+1)] );
     };
 
     const eventOnKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

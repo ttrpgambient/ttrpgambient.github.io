@@ -22,8 +22,8 @@ export const LoginPopup: FunctionComponent<Props> = ({onClose, isVisible }) => {
     }
 
     return (
-        <div className="login-popup-container default-theme" style={{display: visibility}}>
-            <button type="button" className='close-window-button' onClick={onClose}>X</button>
+        <div className="login-popup-container default-window-theme" style={{display: visibility}}>
+            <label className='default-button-theme close-window-button' onClick={onClose}>X</label>
             <div className="login-popup-buttons-container">
                 <button type="button" className='login-popup-button' onClick={DropboxLogIn}>Dropbox</button><br/>
                 <button type="button" className='login-popup-button'>Google Drive</button>
