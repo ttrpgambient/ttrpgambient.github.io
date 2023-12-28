@@ -1,14 +1,13 @@
 //https://dev.to/0shuvo0/lets-create-an-add-tags-input-with-react-js-d29
 //https://www.digitalocean.com/community/tutorials/react-react-autocomplete
 
-import { useState, useRef, FunctionComponent } from 'react';
+import { useState, useRef } from 'react';
 import './css/tagsInput.css';
 
-class TagsInputProps { }
 
 const allTags: string[] = ['test0', 'test1', 'test2'];
 
-export const TagsInput: FunctionComponent<TagsInputProps> = (props: TagsInputProps) => {
+export function TagsInput() {
     const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
     const [selectedTags, setSelectedTags] = useState< number[]>( [0, 2] );
     const [currentSuggestions, setCurrentSuggestions] = useState<number[]>([]);
