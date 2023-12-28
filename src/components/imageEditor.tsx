@@ -1,7 +1,10 @@
 import { ChangeEvent, useRef, DragEvent } from 'react';
+import { appGlobals } from '../system/appGlobals';
+
 import './css/imageEditor.css'
 
 import { TagsInput } from './tagsInput'
+import { FileSystemStatus, FileUploadMode } from '../interfaces/system/fs_interface';
 
 const SUPPORTED_FORMATS = new Set(['image/png', 'image/jpeg']);
 const DROP_DEFAULT_COLOR = '#919191';
@@ -11,7 +14,25 @@ export function ImageEditor() {
 
     const imgElement = useRef<HTMLImageElement>(null);
 
-    function loadImageFile( image: File ) {
+    function uploadImage( file: File ) {
+        if ( !!!file ) return;
+        if ( !!!appGlobals.system ) return;
+
+        if ( !SUPPORTED_FORMATS.has(file.type)) {
+            throw Error('Wrong file type to upload: ' + file.type);
+        }
+
+        appGlobals.system.getFileSystem().uploadFile('/' + file.name, {content: file}, FileUploadMode.Add)
+        .then(
+            (result) => {
+                if (result.status !== FileSystemStatus.Success) {
+                    throw Error('Couldnt upload medium, status: ' + result.status);
+                }
+            }
+        )
+    }
+
+    function showImageFile( image: File ) {
         const reader = new FileReader();
         reader.onload = function (e) {
             if (!imgElement.current || !e.target || !e.target.result) return;
@@ -25,7 +46,8 @@ export function ImageEditor() {
         
         const input = inputEvent.currentTarget;
         if ( input.files && input.files[0]) {
-            loadImageFile(input.files[0])
+            showImageFile(input.files[0]);
+            uploadImage(input.files[0]);
         }
     }
 
@@ -59,7 +81,8 @@ export function ImageEditor() {
                     const file = items[i].getAsFile();
                     if ( !!file ) {
                         if ( SUPPORTED_FORMATS.has(file.type) ) {
-                            loadImageFile(file)
+                            showImageFile(file);
+                            uploadImage(file);
                         }
                     }
                 }
@@ -71,7 +94,8 @@ export function ImageEditor() {
                 const file = files[f];
                 if ( !!file ) {
                     if ( SUPPORTED_FORMATS.has(file.type) ) {
-                        loadImageFile(file)
+                        showImageFile(file);
+                        uploadImage(file);
                     }
                 }
             }
