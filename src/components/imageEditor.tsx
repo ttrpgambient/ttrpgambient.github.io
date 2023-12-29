@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, DragEvent } from 'react';
+import { ChangeEvent, useState, useRef, DragEvent } from 'react';
 import { appGlobals } from '../system/appGlobals';
 
 import './css/imageEditor.css'
@@ -13,6 +13,7 @@ const DROP_HOVER_COLOR = '#FFFFFF';
 export function ImageEditor() {
 
     const imgElement = useRef<HTMLImageElement>(null);
+    const [imgName, setImgName] = useState<string>("");
 
     function uploadImage( file: File ) {
         if ( !!!file ) return;
@@ -26,8 +27,14 @@ export function ImageEditor() {
         .then(
             (result) => {
                 if (result.status !== FileSystemStatus.Success) {
-                    throw Error('Couldnt upload medium, status: ' + result.status);
+                    throw Error('Couldnt upload image, status: ' + result.status);
                 }
+                if ( !!!result.fileInfo ) {
+                    throw Error('Image upload has no fileInfo, status: ' + result.status);
+                }
+                const name = result.fileInfo.name as string;
+                setImgName( name );
+                appGlobals.idbTagsImages.addRecord("", name)
             }
         )
     }
@@ -49,6 +56,20 @@ export function ImageEditor() {
             showImageFile(input.files[0]);
             uploadImage(input.files[0]);
         }
+    }
+
+    function onTagSelect(tagName: string ) {
+        if ( imgName === "") {
+            throw Error('onTagSelect no Image!');
+        }
+        appGlobals.idbTagsImages.addRecord(tagName, imgName);
+    }
+
+    function onTagDeselect(tagName: string ) {
+        if ( imgName === "") {
+            throw Error('onTagSelect no Image!');
+        }
+        appGlobals.idbTagsImages.removeRecord(tagName, imgName);
     }
 
     function onDragEnter(e: DragEvent<HTMLDivElement>) {
@@ -106,7 +127,7 @@ export function ImageEditor() {
         <div className='image-editor-container default-window-theme'>
             <button type='button'>Remove</button>
             <button type='button'>Add</button>
-            <TagsInput/>
+            <TagsInput onTagSelect={onTagSelect} onTagDeselect={onTagDeselect} disabled={imgName === ""}/>
             <label htmlFor='add_image' className='default-button-theme'>
                 Load Image
             </label>

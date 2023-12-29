@@ -49,6 +49,10 @@ export class IDBObject {
                 }
             }
         };
+
+        openRequest.onsuccess = () => {
+            this.idb = openRequest.result;
+        }
     }
 
     public import(dbJson: string): Promise<void> {

@@ -1,15 +1,20 @@
 //https://dev.to/0shuvo0/lets-create-an-add-tags-input-with-react-js-d29
 //https://www.digitalocean.com/community/tutorials/react-react-autocomplete
 
-import { useState, useRef } from 'react';
+import { useState, useRef, FunctionComponent } from 'react';
 import './css/tagsInput.css';
+import { appGlobals } from '../system/appGlobals';
+import { authGlobal } from '../system/authentication';
 
+type Props = {
+    onTagSelect: (tagName: string) => void;
+    onTagDeselect: (tagName: string) => void;
+    disabled?: boolean
+}
 
-const allTags: string[] = ['test0', 'test1', 'test2'];
-
-export function TagsInput() {
+export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect, disabled=false}) => {
     const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
-    const [selectedTags, setSelectedTags] = useState< number[]>( [0, 2] );
+    const [selectedTags, setSelectedTags] = useState< number[]>( [] );
     const [currentSuggestions, setCurrentSuggestions] = useState<number[]>([]);
 
     const inputElement = useRef<HTMLInputElement>(null);
@@ -20,15 +25,16 @@ export function TagsInput() {
 
         value = value.toLowerCase();
 
-        let tagID = allTags.indexOf(value);
+        let tagID = appGlobals.tags.indexOf(value);
         if (tagID === -1) {
             // new tag
-            tagID = allTags.push(value) - 1;
+            tagID = appGlobals.tags.push(value) - 1;
         } else {
             if (selectedTags.includes(tagID)) return false;
         }
 
         setSelectedTags( (prevSelectedTags) => { return [...prevSelectedTags, tagID] } );
+        onTagSelect(value);
         return true;
     };
 
@@ -61,10 +67,10 @@ export function TagsInput() {
         if (element.value !== '') {
             const value = element.value.toLowerCase();
             
-            const tagsCount = allTags.length;
+            const tagsCount = appGlobals.tags.length;
             for (let tagID = 0; tagID < tagsCount; ++tagID) {
                 if (!selectedTags.includes(tagID)) {
-                    if (allTags[tagID].includes(value)) {
+                    if (appGlobals.tags[tagID].includes(value)) {
                         tmpCurrentSuggestions.push(tagID);
                     }
                 }
@@ -76,6 +82,7 @@ export function TagsInput() {
 
     // Events
     const eventRemoveTag = (index: number) => {
+        onTagDeselect( appGlobals.tags[selectedTags[index]] );
         setSelectedTags( prevSelectedTags => [...prevSelectedTags.slice(0, index), ...prevSelectedTags.slice(index+1)] );
     };
 
@@ -88,7 +95,7 @@ export function TagsInput() {
             return;
         } else if (event.key === 'Enter') {
             if (selectedSuggestion !== -1) {
-                element.value = allTags[currentSuggestions[selectedSuggestion]];
+                element.value = appGlobals.tags[currentSuggestions[selectedSuggestion]];
                 updateCurrentSuggestions(element);
             } else {
                 if (addTag(element.value)) {
@@ -126,7 +133,7 @@ export function TagsInput() {
             currentSelectedSuggestion = findSuggestionID(event.currentTarget);
         }
 
-        element.value = allTags[currentSuggestions[currentSelectedSuggestion]];
+        element.value = appGlobals.tags[currentSuggestions[currentSelectedSuggestion]];
         updateCurrentSuggestions(element);
         element.focus();
     };
@@ -148,7 +155,7 @@ export function TagsInput() {
                     className = 'tags-suggestion-active';
                 }
 
-                const tag = allTags[suggestionID];
+                const tag = appGlobals.tags[suggestionID];
                 return (
                     <li
                         className={className}
@@ -168,7 +175,7 @@ export function TagsInput() {
             <div className="tags-input-container">
                 {selectedTags.map((tagID, index) => (
                     <div className="tag-item" key={index}>
-                        <span className="text">{allTags[tagID]}</span>
+                        <span className="text">{appGlobals.tags[tagID]}</span>
                         <span className="close" onClick={() => eventRemoveTag(index)}>
                             &times;
                         </span>
@@ -181,6 +188,7 @@ export function TagsInput() {
                     placeholder="Type something"
                     onKeyDown={eventOnKeyDown}
                     onChange={eventOnChange}
+                    disabled={disabled}
                 />
             </div>
             {renderSuggestions()}
