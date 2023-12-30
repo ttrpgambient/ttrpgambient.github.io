@@ -5,13 +5,12 @@ import { WelcomeScreen } from './components/welcomeScreen';
 import { Stories } from './components/stories';
 
 import { authGlobal, AUTH_DISABLED, AUTH_LOGIN, AUTH_LOGOUT } from './system/authentication';
-import { appGlobals } from './system/appGlobals';
 
 function App() {
   const [authButtonState, setAuthButtonState] = useState(AUTH_DISABLED);
 
   function createIDBTagsImages() {
-    
+
   }
 
   useEffect(() => {

@@ -15,6 +15,10 @@ export const WelcomeScreen: FunctionComponent<Props> = ({isLogInDisabled}) => {
         setShowLoginPopup(!showLoginPopup)
       }
 
+    function RenderLoginPopup() {
+        if ( showLoginPopup )
+            return <LoginPopup onClose={handleLogInClick}/>
+    }
     return (
         <div>
             <button type='button' onClick={handleLogInClick} disabled = {isLogInDisabled}>Log In</button>
@@ -24,7 +28,7 @@ export const WelcomeScreen: FunctionComponent<Props> = ({isLogInDisabled}) => {
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.<br/>
                 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </div>
-            <LoginPopup onClose={handleLogInClick} isVisible={showLoginPopup}/>
+            <RenderLoginPopup/>
         </div>
     );
 }

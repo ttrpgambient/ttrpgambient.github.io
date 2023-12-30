@@ -8,14 +8,12 @@ import { ImageEditor } from './imageEditor';
 
 type Props = {
     onClose: () => void;
-    isVisible: boolean;
 }
 
-export const ImageManager: FunctionComponent<Props> = ({onClose, isVisible }) => {
-    const visibility = isVisible ? "block" : "none";
+export const ImageManager: FunctionComponent<Props> = ({onClose }) => {
 
     return ( 
-        <div className='image-manager-container default-window-theme' style={{display: visibility}}>
+        <div className='image-manager-container default-window-theme'>
             <div className='clearfix'>
                 <label className='default-button-theme close-window-button' onClick={onClose}>X</label>
             </div>

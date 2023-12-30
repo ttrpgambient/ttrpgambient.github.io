@@ -4,7 +4,6 @@
 import { useState, useRef, FunctionComponent } from 'react';
 import './css/tagsInput.css';
 import { appGlobals } from '../system/appGlobals';
-import { authGlobal } from '../system/authentication';
 
 type Props = {
     onTagSelect: (tagName: string) => void;

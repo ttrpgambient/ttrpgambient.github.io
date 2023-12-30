@@ -22,6 +22,11 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
         setShowImageManager(!showImageManager)
       }
 
+    function RenderImageManager() {
+        if ( showImageManager )
+            return <ImageManager onClose={handleImageManagerClick}/>
+    }
+
     return (
         <div>
             <div className='stories-settings-bar'>
@@ -35,7 +40,7 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
                     <SceneView/>
                 </div>
             </div>
-            <ImageManager onClose={handleImageManagerClick} isVisible={showImageManager}/>
+            <RenderImageManager/>
         </div>
     );
 }

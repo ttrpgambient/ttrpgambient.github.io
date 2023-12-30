@@ -9,11 +9,9 @@ import { Dropbox } from '../system/dropbox/dropbox';
 
 type Props = {
     onClose: () => void;
-    isVisible: boolean;
 }
 
-export const LoginPopup: FunctionComponent<Props> = ({onClose, isVisible }) => {
-    const visibility = isVisible ? "block" : "none";
+export const LoginPopup: FunctionComponent<Props> = ({onClose }) => {
 
     function DropboxLogIn() {
         window.localStorage.setItem(SYSTEM_NAME, DROPBOX_APP);
@@ -22,7 +20,7 @@ export const LoginPopup: FunctionComponent<Props> = ({onClose, isVisible }) => {
     }
 
     return (
-        <div className="login-popup-container default-window-theme" style={{display: visibility}}>
+        <div className="login-popup-container default-window-theme">
             <label className='default-button-theme close-window-button' onClick={onClose}>X</label>
             <div className="login-popup-buttons-container">
                 <button type="button" className='login-popup-button' onClick={DropboxLogIn}>Dropbox</button><br/>

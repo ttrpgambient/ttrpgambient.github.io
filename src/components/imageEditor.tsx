@@ -1,5 +1,5 @@
 import { ChangeEvent, useState, useRef, DragEvent } from 'react';
-import { appGlobals } from '../system/appGlobals';
+import { appGlobals, IMAGES_PATH } from '../system/appGlobals';
 
 import './css/imageEditor.css'
 
@@ -23,7 +23,7 @@ export function ImageEditor() {
             throw Error('Wrong file type to upload: ' + file.type);
         }
 
-        appGlobals.system.getFileSystem().uploadFile('/' + file.name, {content: file}, FileUploadMode.Add)
+        appGlobals.system.getFileSystem().uploadFile( IMAGES_PATH + file.name, {content: file}, FileUploadMode.Add )
         .then(
             (result) => {
                 if (result.status !== FileSystemStatus.Success) {
