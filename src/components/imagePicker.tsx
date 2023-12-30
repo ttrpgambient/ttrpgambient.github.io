@@ -29,7 +29,7 @@ export function ImagePicker() {
     }
 
     useEffect(() => {
-        appGlobals.idbTagsImages.getAllTagsImages( tagsListState, getImageList );
+        appGlobals.idbTagsImages.getAllImagesWithTags( tagsListState, getImageList );
     }, [tagsListState])
 
     return (
