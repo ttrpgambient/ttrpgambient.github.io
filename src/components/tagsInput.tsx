@@ -6,8 +6,8 @@ import './css/tagsInput.css';
 import { appGlobals } from '../system/appGlobals';
 
 type Props = {
-    onTagSelect: (tagName: string) => void;
-    onTagDeselect: (tagName: string) => void;
+    onTagSelect: (tagName: string, tagsList: string[]) => void;
+    onTagDeselect: (tagName: string, tagsList: string[]) => void;
     disabled?: boolean
 }
 
@@ -32,8 +32,11 @@ export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect,
             if (selectedTags.includes(tagID)) return false;
         }
 
+        let tagNames = selectedTags.map(tagID => appGlobals.tags[tagID]);
+        tagNames.push( value );
+        onTagSelect(value, tagNames);
+
         setSelectedTags( (prevSelectedTags) => { return [...prevSelectedTags, tagID] } );
-        onTagSelect(value);
         return true;
     };
 
@@ -81,7 +84,15 @@ export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect,
 
     // Events
     const eventRemoveTag = (index: number) => {
-        onTagDeselect( appGlobals.tags[selectedTags[index]] );
+        const tagName = appGlobals.tags[selectedTags[index]]; 
+        const tmpSelectedTags = selectedTags;
+        
+        const selectedTagsCount = tmpSelectedTags.length;
+        tmpSelectedTags[index] = tmpSelectedTags[selectedTagsCount - 1];
+        tmpSelectedTags.length = selectedTagsCount - 1;
+        const tagNames = tmpSelectedTags.map(tagID => appGlobals.tags[tagID]);
+        onTagDeselect( tagName, tagNames );
+        
         setSelectedTags( prevSelectedTags => [...prevSelectedTags.slice(0, index), ...prevSelectedTags.slice(index+1)] );
     };
 

@@ -89,23 +89,52 @@ export class IDBTagsImages {
         }
     }
 
-    getAllTagsImages(tagName: string): string[] {
-        let images: string[] = [];
-
+    getAllTagsImages(tagsList: string[], callback: (images: string[]) => void) {
         const index = this.idb.get()
-                        .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
-                        .objectStore(DB_TAG_TO_IMAGE_STORE)
-                        .index(DB_TAG);
+        .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
+        .objectStore(DB_TAG_TO_IMAGE_STORE)
+        .index(DB_TAG);
 
-        index.openCursor(IDBKeyRange.only(tagName)).onsuccess = (e) => {
-            const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
-            if ( cursor ) {
-                images.push( cursor.value.imageName );
-                cursor.continue();
-            }
+        const tagsCount = tagsList.length;
+
+        let cursors: Promise<string[]>[] = [];
+        for ( let tagID = 0; tagID < tagsCount; ++tagID ) {
+            const tag = tagsList[tagID];
+            const cursor = new Promise<string[]>( (resolve) => {
+                    let imagesList: string[] = [];
+                    index.openCursor(IDBKeyRange.only(tag)).onsuccess = function (e) {
+                        const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
+                        if ( cursor ) {
+                            imagesList.push( cursor.value.imageName );
+                            cursor.continue();
+                        } else {
+                            resolve(imagesList);
+                        }
+                    }
+                } 
+            )
+            
+            cursors.push(cursor);
         }
 
-        return images;
+        Promise.all(cursors).then( (allImages: string[][]) => {
+                const imagesArrayCount = allImages.length
+                let imagesList: string[] = [];
+
+                if ( imagesArrayCount > 0 ) {
+                    imagesList = allImages[0];
+
+                    for ( let a = 1; a < imagesArrayCount; ++a ) {
+                        let tmpImageList: string[] = [];
+                        tmpImageList = allImages[a].filter(image => imagesList.includes(image));
+
+                        imagesList = tmpImageList;
+                    }
+                }
+
+                callback(imagesList);
+            }
+        )
     }
 
     getAllImagesTags(imageName: string): string[] {

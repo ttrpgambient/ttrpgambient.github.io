@@ -1,0 +1,4 @@
+.image-picker-grid {
+    display: grid;
+    grid-auto-columns: auto auto auto;
+}
