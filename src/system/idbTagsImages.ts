@@ -71,6 +71,24 @@ export class IDBTagsImages {
         }
     }
 
+    getAllTags(callback: (tagsList: string[]) => void ) {
+        const index = this.idb.get()
+            .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
+            .objectStore(DB_TAG_TO_IMAGE_STORE)
+            .index(DB_TAG);
+
+        let tagsList: Set<string> = new Set<string>();
+        index.openCursor().onsuccess = (e) => {
+            const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
+            if ( cursor ) {
+                tagsList.add( cursor.value.tagName );
+                cursor.continue();
+            } else {
+                callback(Array.from(tagsList));
+            }
+        }
+    }
+
     getAllTagsImages(tagName: string): string[] {
         let images: string[] = [];
 
