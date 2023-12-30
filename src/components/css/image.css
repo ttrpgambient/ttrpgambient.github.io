@@ -1,0 +1,7 @@
+
+.image-main {
+    position: relative;
+    width: 33%;
+    left: 50%;
+    translate: -50% 0%;
+}

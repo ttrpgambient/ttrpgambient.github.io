@@ -2,20 +2,27 @@ import './css/imagePicker.css'
 import { TagsInput } from './tagsInput'
 import { useState, useEffect } from 'react'
 import { appGlobals } from '../system/appGlobals';
+import { Image } from './image';
 
 export function ImagePicker() {
-    const [tagsVersion, setTagsVersion] = useState(0);
     const [imageList, setImageList] = useState<string[]>([])
 
     const [tagsListState, setTagsListState] = useState<string[]>([""]);
 
     function ImagesGrid() {
+        let images: JSX.Element[] = [];
+        
+        for ( let image of imageList ) {
+            images.push(
+                <Image key={image} imageName={image}/>
+            )
+        }
 
+        return images;
     }
 
     function getImageList(imageList: string[]) {
-        setImageList( imageList );
-        console.log(imageList);
+            setImageList( imageList );
     }
 
     function onTagSelect(_tagName: string, tagsList: string[] ) {
@@ -36,7 +43,7 @@ export function ImagePicker() {
         <div className='default-window-theme'>
             <TagsInput onTagSelect={onTagSelect} onTagDeselect={onTagDeselect} disabled={false}/>
             <div className='image-picker-grid'>
-
+                <ImagesGrid/>
             </div>
         </div>
     )

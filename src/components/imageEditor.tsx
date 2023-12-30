@@ -1,12 +1,11 @@
 import { ChangeEvent, useState, useRef, DragEvent } from 'react';
-import { appGlobals, IMAGES_PATH } from '../system/appGlobals';
+import { appGlobals, IMAGES_PATH, SUPPORTED_FORMATS } from '../system/appGlobals';
 
 import './css/imageEditor.css'
 
 import { TagsInput } from './tagsInput'
 import { FileSystemStatus, FileUploadMode } from '../interfaces/system/fs_interface';
 
-const SUPPORTED_FORMATS = new Set(['image/png', 'image/jpeg']);
 const DROP_DEFAULT_COLOR = '#919191';
 const DROP_HOVER_COLOR = '#FFFFFF';
 

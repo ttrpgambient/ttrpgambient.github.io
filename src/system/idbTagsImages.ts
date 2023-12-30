@@ -43,14 +43,29 @@ export class IDBTagsImages {
     }
 
     addRecord( tagName: string, imageName: string ) {
-        let record = new TagImageRecord();
-        record.tagName = tagName;
-        record.imageName = imageName;
-        
-        return this.idb.get()
-                .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
-                .objectStore(DB_TAG_TO_IMAGE_STORE)
-                .add(record);
+        const index = this.idb.get()
+            .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
+            .objectStore(DB_TAG_TO_IMAGE_STORE)
+            .index(DB_IMAGE);
+
+        index.openCursor(IDBKeyRange.only(imageName)).onsuccess = (e) => {
+            const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
+            if ( cursor ) {
+                if ( tagName === cursor.value.tagName ) {
+                    return;
+                }
+                cursor.continue();
+            } else {
+                let record = new TagImageRecord();
+                record.tagName = tagName;
+                record.imageName = imageName;
+                
+                this.idb.get()
+                    .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
+                    .objectStore(DB_TAG_TO_IMAGE_STORE)
+                    .add(record);
+            }
+        }
     }
 
     removeRecord( tagName: string, imageName: string ) {
