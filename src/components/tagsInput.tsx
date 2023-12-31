@@ -159,7 +159,7 @@ export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect,
     const renderSuggestions = (): React.ReactNode => (
         <ul ref={suggestionsElement} className="tags-suggestions">
             {currentSuggestions.map((suggestionID, index) => {
-                let className;
+                let className = 'tags-suggestion';
                 // Flag the active suggestion with a class
                 if (index === selectedSuggestion) {
                     className = 'tags-suggestion-active';
