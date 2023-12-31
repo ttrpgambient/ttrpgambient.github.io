@@ -40,7 +40,7 @@ export function ImagePicker() {
     }, [tagsListState])
 
     return (
-        <div className='default-window-theme'>
+        <div className='image-picker-container default-window-theme'>
             <TagsInput onTagSelect={onTagSelect} onTagDeselect={onTagDeselect} disabled={false}/>
             <div className='image-picker-grid'>
                 <ImagesGrid/>

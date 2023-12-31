@@ -30,5 +30,9 @@ export const Image: FunctionComponent<Props> = ({ imageName }) => {
                 )
         }
     }, []);
-    return <img ref={imgRef} src="tmp_image.svg" className='image-main' />
+    return ( 
+    <div className='image-container'>
+        <img ref={imgRef} src="tmp_image.svg" className='image-main' style={{fill: 'white'}}/>
+    </div>
+    )
 }

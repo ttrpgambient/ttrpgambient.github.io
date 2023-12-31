@@ -50,6 +50,8 @@ export function ImageEditor() {
     function readIMG(inputEvent: ChangeEvent<HTMLInputElement>) {
         if ( !imgElement.current ) return;
         
+        setImgName( "" );
+
         const input = inputEvent.currentTarget;
         if ( input.files && input.files[0]) {
             showImageFile(input.files[0]);
