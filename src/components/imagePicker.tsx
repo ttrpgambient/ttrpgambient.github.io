@@ -1,13 +1,15 @@
 import './css/imagePicker.css'
 import { TagsInput } from './tagsInput'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { appGlobals } from '../system/appGlobals';
 import { Image } from './image';
 
 export function ImagePicker() {
     const [imageList, setImageList] = useState<string[]>([])
+    const [tagsListState, setTagsListState] = useState<string[]>([]);
 
-    const [tagsListState, setTagsListState] = useState<string[]>([""]);
+    const imageTagList = useRef<string[]>([]);
+    const imageEmptyTagList = useRef<string[]>([]);
 
     function ImagesGrid() {
         let images: JSX.Element[] = [];
@@ -21,22 +23,35 @@ export function ImagePicker() {
         return images;
     }
 
-    function getImageList(imageList: string[]) {
-            setImageList( imageList );
+    function getAllImagesWithTags(imageList: string[]) {
+        imageTagList.current = imageList;
+        setImageList( [...imageEmptyTagList.current, ...imageTagList.current] );
+    }
+
+    function getEmptyTagList(imageList: string[]) {
+        imageEmptyTagList.current = imageList;
+        setImageList( [...imageEmptyTagList.current, ...imageTagList.current] );
     }
 
     function onTagSelect(_tagName: string, tagsList: string[] ) {
-        tagsList.push("");
         setTagsListState( tagsList );
     }
 
     function onTagDeselect(_tagName: string, tagsList: string[] ) {
-        tagsList.push("");
         setTagsListState( tagsList );
     }
 
     useEffect(() => {
-        appGlobals.idbTagsImages.getAllImagesWithTags( tagsListState, getImageList );
+        setImageList([]);
+        imageEmptyTagList.current = [];
+        imageTagList.current = [];
+
+        if (tagsListState.length == 0) {
+            appGlobals.idbTagsImages.getAllImagesWithTags( [""], getAllImagesWithTags );
+        } else {
+            appGlobals.idbTagsImages.getImagesExclusiveTag( "", getEmptyTagList );
+            appGlobals.idbTagsImages.getAllImagesWithTags( tagsListState, getAllImagesWithTags );
+        }
     }, [tagsListState])
 
     return (

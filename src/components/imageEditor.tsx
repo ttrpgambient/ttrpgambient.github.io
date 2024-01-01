@@ -126,8 +126,6 @@ export function ImageEditor() {
 
     return (
         <div className='image-editor-container default-window-theme'>
-            <button type='button'>Remove</button>
-            <button type='button'>Add</button>
             <TagsInput onTagSelect={onTagSelect} onTagDeselect={onTagDeselect} disabled={imgName === ""}/>
             <label htmlFor='add_image' className='default-button-theme'>
                 Load Image

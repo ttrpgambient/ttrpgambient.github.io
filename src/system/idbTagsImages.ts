@@ -151,4 +151,36 @@ export class IDBTagsImages {
             }
         )
     }
+
+    getImagesExclusiveTag(tagName: string, callback: (images: string[]) => void) {
+        const index = this.idb.get()
+        .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
+        .objectStore(DB_TAG_TO_IMAGE_STORE)
+        .index(DB_IMAGE);
+
+        let imagesMap: Map<string, {count: number, tag: boolean}> = new Map<string, {count: number, tag: boolean}>;
+        index.openCursor().onsuccess = function (e) {
+            const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
+            if ( cursor ) {
+                const tagMatch = tagName === cursor.value.tagName;
+                if ( imagesMap.has(cursor.value.imageName) ) {
+                    let image = imagesMap.get(cursor.value.imageName) as {count: number, tag: boolean};
+                    image.count += 1;
+                    image.tag = image.tag || tagMatch;
+                    imagesMap.set(cursor.value.imageName, image);
+                } else {
+                    imagesMap.set(cursor.value.imageName, {count: 1, tag: tagMatch});
+                }
+                cursor.continue();
+            } else {
+                let imagesList: string[] = [];
+                for ( let [key, value] of imagesMap ) {
+                    if ( value.count === 1 && value.tag === true) {
+                        imagesList.push(key);
+                    }
+                }
+                callback(imagesList);
+            }
+        }
+    }
 }
