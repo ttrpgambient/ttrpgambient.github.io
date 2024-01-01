@@ -42,7 +42,7 @@ export class IDBTagsImages {
         this.idb = new IDBObject(DB_TAG_TO_IMAGE, DB_VERSION, objectStore);
     }
 
-    addRecord(tagName: string, imageName: string) {
+    addRecord(tagName: string, imageName: string, callback?: ()=>void) {
         const index = this.idb.get()
             .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
             .objectStore(DB_TAG_TO_IMAGE_STORE)
@@ -63,7 +63,7 @@ export class IDBTagsImages {
                 this.idb.get()
                     .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
                     .objectStore(DB_TAG_TO_IMAGE_STORE)
-                    .add(record);
+                    .add(record).onsuccess = () => {if (callback) callback()};
             }
         }
     }

@@ -5,10 +5,11 @@ import { appGlobals } from '../system/appGlobals';
 import { Image } from './image';
 
 type Props = {
+    managerVersion: number;
     setImageToEdit: (imageName: string) => void;
 }
 
-export const ImagePicker: FunctionComponent<Props> = ({setImageToEdit}) => {
+export const ImagePicker: FunctionComponent<Props> = ({managerVersion, setImageToEdit}) => {
     const [imageList, setImageList] = useState<string[]>([])
     const [tagsListState, setTagsListState] = useState<string[]>([]);
 
@@ -44,7 +45,7 @@ export const ImagePicker: FunctionComponent<Props> = ({setImageToEdit}) => {
             appGlobals.idbTagsImages.getImagesExclusiveTag( "", getEmptyTagList );
             appGlobals.idbTagsImages.getAllImagesWithTags( tagsListState, getAllImagesWithTags );
         }
-    }, [tagsListState])
+    }, [managerVersion, tagsListState])
 
     function ImagesGrid() {
         let images: JSX.Element[] = [];

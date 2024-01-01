@@ -10,17 +10,18 @@ const DROP_DEFAULT_COLOR = '#919191';
 const DROP_HOVER_COLOR = '#FFFFFF';
 
 type Props = {
+    updateManagerVersion: () => void;
     setImageToEdit: (imageName: string) => void;
     openImageName?: string
 }
 
-export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImageName}) => {
+export const ImageEditor: FunctionComponent<Props> = ({updateManagerVersion, setImageToEdit, openImageName}) => {
 
     const imgElement = useRef<HTMLImageElement>(null);
     const [imgName, setImgName] = useState<string>("");
     const [tags, setTags] = useState<string[]>([]);
 
-    function uploadImage( file: File ) {
+    function uploadImage( file: File, fileURL: string ) {
         if ( !!!file ) return;
         if ( !!!appGlobals.system ) return;
 
@@ -40,16 +41,23 @@ export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImage
                 const name = result.fileInfo.name as string;
                 setImgName( name );
                 setImageToEdit("")
-                appGlobals.idbTagsImages.addRecord("", name)
+                appGlobals.idbTagsImages.addRecord("", name, () => {
+                    appGlobals.imagesCache.set(name, fileURL);
+                    updateManagerVersion();
+                })
+                
             }
         )
     }
 
-    function showImageFile( image: File ) {
+    function showAndUploadImageFile( image: File ) {
         const reader = new FileReader();
         reader.onload = function (e) {
             if (!imgElement.current || !e.target || !e.target.result) return;
-            imgElement.current.src = e.target.result as string;
+            const imgURL = e.target.result as string;
+            imgElement.current.src = imgURL;
+
+            uploadImage(image, imgURL);
         }
         reader.readAsDataURL(image);
     }
@@ -61,8 +69,7 @@ export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImage
 
         const input = inputEvent.currentTarget;
         if ( input.files && input.files[0]) {
-            showImageFile(input.files[0]);
-            uploadImage(input.files[0]);
+            showAndUploadImageFile(input.files[0]);
         }
     }
 
@@ -110,8 +117,7 @@ export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImage
                     const file = items[i].getAsFile();
                     if ( !!file ) {
                         if ( SUPPORTED_FORMATS.has(file.type) ) {
-                            showImageFile(file);
-                            uploadImage(file);
+                            showAndUploadImageFile(file);
                         }
                     }
                 }
@@ -123,8 +129,7 @@ export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImage
                 const file = files[f];
                 if ( !!file ) {
                     if ( SUPPORTED_FORMATS.has(file.type) ) {
-                        showImageFile(file);
-                        uploadImage(file);
+                        showAndUploadImageFile(file);
                     }
                 }
             }

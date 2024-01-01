@@ -20,23 +20,6 @@ export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect,
     const inputElement = useRef<HTMLInputElement>(null);
     const suggestionsElement = useRef<HTMLUListElement>(null);
 
-    useEffect(() => {
-        if (usedTags && usedTags.length > 0) {
-
-            const emptyID = usedTags.indexOf("");
-            usedTags = [...usedTags.slice(0, emptyID), ...usedTags.slice(emptyID + 1)];
-
-            let tmpTagsIDs = usedTags.map(tag => {
-                const tagID = appGlobals.tags.indexOf(tag);
-                if (tagID === -1) {
-                    throw Error('Tag doesnt exist: ' + tag);
-                }
-                return tagID
-            });
-            setSelectedTags(tmpTagsIDs);
-        }
-    }, [usedTags]);
-
     const addTag = (value: string): boolean => {
         if (!value.trim()) return false;
 
@@ -172,6 +155,24 @@ export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect,
             setSelectedSuggestion(suggestionID);
         }
     };
+
+    // Logic
+    useEffect(() => {
+        if (usedTags && usedTags.length > 0) {
+
+            const emptyID = usedTags.indexOf("");
+            usedTags = [...usedTags.slice(0, emptyID), ...usedTags.slice(emptyID + 1)];
+
+            let tmpTagsIDs = usedTags.map(tag => {
+                const tagID = appGlobals.tags.indexOf(tag);
+                if (tagID === -1) {
+                    throw Error('Tag doesnt exist: ' + tag);
+                }
+                return tagID
+            });
+            setSelectedTags(tmpTagsIDs);
+        }
+    }, [usedTags]);
 
     // Render
     const renderSuggestions = (): React.ReactNode => (
