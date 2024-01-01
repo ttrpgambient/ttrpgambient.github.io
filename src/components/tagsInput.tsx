@@ -1,23 +1,41 @@
 //https://dev.to/0shuvo0/lets-create-an-add-tags-input-with-react-js-d29
 //https://www.digitalocean.com/community/tutorials/react-react-autocomplete
 
-import { useState, useRef, FunctionComponent } from 'react';
+import { useState, useRef, FunctionComponent, useEffect } from 'react';
 import './css/tagsInput.css';
 import { appGlobals } from '../system/appGlobals';
 
 type Props = {
     onTagSelect: (tagName: string, tagsList: string[]) => void;
     onTagDeselect: (tagName: string, tagsList: string[]) => void;
-    disabled?: boolean
+    disabled?: boolean;
+    usedTags?: string[];
 }
 
-export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect, disabled=false}) => {
+export const TagsInput: FunctionComponent<Props> = ({onTagSelect, onTagDeselect, disabled=false, usedTags=[]}) => {
     const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
     const [selectedTags, setSelectedTags] = useState< number[]>( [] );
     const [currentSuggestions, setCurrentSuggestions] = useState<number[]>([]);
 
     const inputElement = useRef<HTMLInputElement>(null);
     const suggestionsElement = useRef<HTMLUListElement>(null);
+
+    useEffect(() => {
+        if (usedTags && usedTags.length > 0) {
+
+            const emptyID = usedTags.indexOf("");
+            usedTags = [...usedTags.slice(0, emptyID), ...usedTags.slice(emptyID + 1)];
+
+            let tmpTagsIDs = usedTags.map(tag => {
+                const tagID = appGlobals.tags.indexOf(tag);
+                if (tagID === -1) {
+                    throw Error('Tag doesnt exist: ' + tag);
+                }
+                return tagID
+            });
+            setSelectedTags(tmpTagsIDs);
+        }
+    }, [usedTags]);
 
     const addTag = (value: string): boolean => {
         if (!value.trim()) return false;

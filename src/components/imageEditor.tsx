@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useRef, DragEvent, FunctionComponent } from 'react';
+import { ChangeEvent, useState, useRef, DragEvent, FunctionComponent, useEffect } from 'react';
 import { appGlobals, IMAGES_PATH, SUPPORTED_FORMATS } from '../system/appGlobals';
 
 import './css/imageEditor.css'
@@ -18,6 +18,7 @@ export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImage
 
     const imgElement = useRef<HTMLImageElement>(null);
     const [imgName, setImgName] = useState<string>("");
+    const [tags, setTags] = useState<string[]>([]);
 
     function uploadImage( file: File ) {
         if ( !!!file ) return;
@@ -130,22 +131,29 @@ export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImage
         }
     }
 
-    if (openImageName && openImageName !== "" && openImageName !== imgName) {
-        if ( !imgElement.current ){
-            throw Error('No Image element');
-        }
+    useEffect(() => {
+        if (openImageName && openImageName !== "" && openImageName !== imgName) {
+            if (!imgElement.current) {
+                throw Error('No Image element');
+            }
 
-        if ( !appGlobals.imagesCache.has(openImageName) ) {
-            throw Error('No Image in Cache: ' + openImageName);
-        }
+            if (!appGlobals.imagesCache.has(openImageName)) {
+                throw Error('No Image in Cache: ' + openImageName);
+            }
 
-        setImgName(openImageName)
-        imgElement.current.src = appGlobals.imagesCache.get(openImageName) as string;
-    }
+            setImgName(openImageName)
+
+            appGlobals.idbTagsImages.getImageTags(openImageName, (tags) => {
+                    setTags(tags)
+            });
+
+            imgElement.current.src = appGlobals.imagesCache.get(openImageName) as string;
+        }
+    }, [openImageName]);
 
     return (
         <div className='image-editor-container default-window-theme'>
-            <TagsInput onTagSelect={onTagSelect} onTagDeselect={onTagDeselect} disabled={imgName === ""}/>
+            <TagsInput onTagSelect={onTagSelect} onTagDeselect={onTagDeselect} disabled={imgName === ""} usedTags={tags}/>
             <label htmlFor='add_image' className='default-button-theme'>
                 Load Image
             </label>
