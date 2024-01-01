@@ -20,7 +20,7 @@ export const ImageManager: FunctionComponent<Props> = ({onClose }) => {
             </div>
             <div className='image-manager-view'>
                 <ImagePicker setImageToEdit={setImageToEdit}/>
-                <ImageEditor openImage={imageToEdit}/>
+                <ImageEditor setImageToEdit={setImageToEdit} openImageName={imageToEdit}/>
             </div>
         </div>
     )

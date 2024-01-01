@@ -10,10 +10,11 @@ const DROP_DEFAULT_COLOR = '#919191';
 const DROP_HOVER_COLOR = '#FFFFFF';
 
 type Props = {
-    openImage?: string
+    setImageToEdit: (imageName: string) => void;
+    openImageName?: string
 }
 
-export const ImageEditor: FunctionComponent<Props> = ({openImage: openImageName}) => {
+export const ImageEditor: FunctionComponent<Props> = ({setImageToEdit, openImageName}) => {
 
     const imgElement = useRef<HTMLImageElement>(null);
     const [imgName, setImgName] = useState<string>("");
@@ -37,6 +38,7 @@ export const ImageEditor: FunctionComponent<Props> = ({openImage: openImageName}
                 }
                 const name = result.fileInfo.name as string;
                 setImgName( name );
+                setImageToEdit("")
                 appGlobals.idbTagsImages.addRecord("", name)
             }
         )
