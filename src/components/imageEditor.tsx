@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useRef, DragEvent } from 'react';
+import { ChangeEvent, useState, useRef, DragEvent, FunctionComponent } from 'react';
 import { appGlobals, IMAGES_PATH, SUPPORTED_FORMATS } from '../system/appGlobals';
 
 import './css/imageEditor.css'
@@ -9,7 +9,11 @@ import { FileSystemStatus, FileUploadMode } from '../interfaces/system/fs_interf
 const DROP_DEFAULT_COLOR = '#919191';
 const DROP_HOVER_COLOR = '#FFFFFF';
 
-export function ImageEditor() {
+type Props = {
+    openImage?: string
+}
+
+export const ImageEditor: FunctionComponent<Props> = ({openImage: openImageName}) => {
 
     const imgElement = useRef<HTMLImageElement>(null);
     const [imgName, setImgName] = useState<string>("");
@@ -122,6 +126,19 @@ export function ImageEditor() {
                 }
             }
         }
+    }
+
+    if (openImageName && openImageName !== "" && openImageName !== imgName) {
+        if ( !imgElement.current ){
+            throw Error('No Image element');
+        }
+
+        if ( !appGlobals.imagesCache.has(openImageName) ) {
+            throw Error('No Image in Cache: ' + openImageName);
+        }
+
+        setImgName(openImageName)
+        imgElement.current.src = appGlobals.imagesCache.get(openImageName) as string;
     }
 
     return (

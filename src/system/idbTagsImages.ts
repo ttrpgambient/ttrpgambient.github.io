@@ -16,7 +16,7 @@ export class TagImageRecordWithID extends TagImageRecord {
 }
 
 export class IDBTagsImages {
-    
+
     private idb: IDBObject;
 
     constructor() {
@@ -28,12 +28,12 @@ export class IDBTagsImages {
                     {
                         name: DB_TAG,
                         keyPath: "tagName",
-                        options: {unique: false, multiEntry: false}
+                        options: { unique: false, multiEntry: false }
                     },
                     {
                         name: DB_IMAGE,
                         keyPath: "imageName",
-                        options: {unique: false, multiEntry: false}
+                        options: { unique: false, multiEntry: false }
                     }
                 ]
             }
@@ -42,7 +42,7 @@ export class IDBTagsImages {
         this.idb = new IDBObject(DB_TAG_TO_IMAGE, DB_VERSION, objectStore);
     }
 
-    addRecord( tagName: string, imageName: string ) {
+    addRecord(tagName: string, imageName: string) {
         const index = this.idb.get()
             .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
             .objectStore(DB_TAG_TO_IMAGE_STORE)
@@ -50,8 +50,8 @@ export class IDBTagsImages {
 
         index.openCursor(IDBKeyRange.only(imageName)).onsuccess = (e) => {
             const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
-            if ( cursor ) {
-                if ( tagName === cursor.value.tagName ) {
+            if (cursor) {
+                if (tagName === cursor.value.tagName) {
                     return;
                 }
                 cursor.continue();
@@ -59,7 +59,7 @@ export class IDBTagsImages {
                 let record = new TagImageRecord();
                 record.tagName = tagName;
                 record.imageName = imageName;
-                
+
                 this.idb.get()
                     .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
                     .objectStore(DB_TAG_TO_IMAGE_STORE)
@@ -68,16 +68,16 @@ export class IDBTagsImages {
         }
     }
 
-    removeRecord( tagName: string, imageName: string ) {
+    removeRecord(tagName: string, imageName: string) {
         const tags = this.idb.get()
-                        .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
-                        .objectStore(DB_TAG_TO_IMAGE_STORE)
-                        .index(DB_TAG);
+            .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
+            .objectStore(DB_TAG_TO_IMAGE_STORE)
+            .index(DB_TAG);
 
         tags.openCursor(IDBKeyRange.only(tagName)).onsuccess = (e) => {
             const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
-            if ( cursor ) {
-                if ( imageName === cursor.value.imageName ) {
+            if (cursor) {
+                if (imageName === cursor.value.imageName) {
                     cursor.delete();
                     return;
                 }
@@ -86,7 +86,7 @@ export class IDBTagsImages {
         }
     }
 
-    getAllTags(callback: (tagsList: string[]) => void ) {
+    getAllTags(callback: (tagsList: string[]) => void) {
         const index = this.idb.get()
             .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
             .objectStore(DB_TAG_TO_IMAGE_STORE)
@@ -95,8 +95,8 @@ export class IDBTagsImages {
         let tagsList: Set<string> = new Set<string>();
         index.openCursor().onsuccess = (e) => {
             const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
-            if ( cursor ) {
-                tagsList.add( cursor.value.tagName );
+            if (cursor) {
+                tagsList.add(cursor.value.tagName);
                 cursor.continue();
             } else {
                 callback(Array.from(tagsList));
@@ -106,81 +106,99 @@ export class IDBTagsImages {
 
     getAllImagesWithTags(tagsList: string[], callback: (images: string[]) => void) {
         const index = this.idb.get()
-        .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
-        .objectStore(DB_TAG_TO_IMAGE_STORE)
-        .index(DB_TAG);
+            .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
+            .objectStore(DB_TAG_TO_IMAGE_STORE)
+            .index(DB_TAG);
 
         const tagsCount = tagsList.length;
 
         let cursors: Promise<string[]>[] = [];
-        for ( let tagID = 0; tagID < tagsCount; ++tagID ) {
+        for (let tagID = 0; tagID < tagsCount; ++tagID) {
             const tag = tagsList[tagID];
-            const cursor = new Promise<string[]>( (resolve) => {
-                    let imagesList: string[] = [];
-                    index.openCursor(IDBKeyRange.only(tag)).onsuccess = function (e) {
-                        const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
-                        if ( cursor ) {
-                            imagesList.push( cursor.value.imageName );
-                            cursor.continue();
-                        } else {
-                            resolve(imagesList);
-                        }
+            const cursor = new Promise<string[]>((resolve) => {
+                let imagesList: string[] = [];
+                index.openCursor(IDBKeyRange.only(tag)).onsuccess = function (e) {
+                    const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
+                    if (cursor) {
+                        imagesList.push(cursor.value.imageName);
+                        cursor.continue();
+                    } else {
+                        resolve(imagesList);
                     }
-                } 
+                }
+            }
             )
-            
+
             cursors.push(cursor);
         }
 
-        Promise.all(cursors).then( (allImages: string[][]) => {
-                const imagesArrayCount = allImages.length
-                let imagesList: string[] = [];
+        Promise.all(cursors).then((allImages: string[][]) => {
+            const imagesArrayCount = allImages.length
+            let imagesList: string[] = [];
 
-                if ( imagesArrayCount > 0 ) {
-                    imagesList = allImages[0];
+            if (imagesArrayCount > 0) {
+                imagesList = allImages[0];
 
-                    for ( let a = 1; a < imagesArrayCount; ++a ) {
-                        let tmpImageList: string[] = [];
-                        tmpImageList = allImages[a].filter(image => imagesList.includes(image));
+                for (let a = 1; a < imagesArrayCount; ++a) {
+                    let tmpImageList: string[] = [];
+                    tmpImageList = allImages[a].filter(image => imagesList.includes(image));
 
-                        imagesList = tmpImageList;
-                    }
+                    imagesList = tmpImageList;
                 }
-
-                callback(imagesList);
             }
+
+            callback(imagesList);
+        }
         )
     }
 
     getImagesExclusiveTag(tagName: string, callback: (images: string[]) => void) {
         const index = this.idb.get()
-        .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
-        .objectStore(DB_TAG_TO_IMAGE_STORE)
-        .index(DB_IMAGE);
+            .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
+            .objectStore(DB_TAG_TO_IMAGE_STORE)
+            .index(DB_IMAGE);
 
-        let imagesMap: Map<string, {count: number, tag: boolean}> = new Map<string, {count: number, tag: boolean}>;
+        let imagesMap: Map<string, { count: number, tag: boolean }> = new Map<string, { count: number, tag: boolean }>;
         index.openCursor().onsuccess = function (e) {
             const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
-            if ( cursor ) {
+            if (cursor) {
                 const tagMatch = tagName === cursor.value.tagName;
-                if ( imagesMap.has(cursor.value.imageName) ) {
-                    let image = imagesMap.get(cursor.value.imageName) as {count: number, tag: boolean};
+                if (imagesMap.has(cursor.value.imageName)) {
+                    let image = imagesMap.get(cursor.value.imageName) as { count: number, tag: boolean };
                     image.count += 1;
                     image.tag = image.tag || tagMatch;
                     imagesMap.set(cursor.value.imageName, image);
                 } else {
-                    imagesMap.set(cursor.value.imageName, {count: 1, tag: tagMatch});
+                    imagesMap.set(cursor.value.imageName, { count: 1, tag: tagMatch });
                 }
                 cursor.continue();
             } else {
                 let imagesList: string[] = [];
-                for ( let [key, value] of imagesMap ) {
-                    if ( value.count === 1 && value.tag === true) {
+                for (let [key, value] of imagesMap) {
+                    if (value.count === 1 && value.tag === true) {
                         imagesList.push(key);
                     }
                 }
                 callback(imagesList);
             }
+        }
+    }
+
+    getImageTags(imageName: string, callback: (tags: string[]) => void) {
+        const index = this.idb.get()
+            .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
+            .objectStore(DB_TAG_TO_IMAGE_STORE)
+            .index(DB_IMAGE);
+
+            let tagsList: string[] = [];
+            index.openCursor(IDBKeyRange.only(imageName)).onsuccess = function (e) {
+                const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
+                if ( cursor ) {
+                    tagsList.push(cursor.value.tagName);
+                    cursor.continue();
+                } else {
+                    callback(tagsList);
+                }
         }
     }
 }

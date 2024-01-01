@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState } from 'react';
 
 import './css/imageManager.css';
 import './css/common.css';
@@ -11,6 +11,7 @@ type Props = {
 }
 
 export const ImageManager: FunctionComponent<Props> = ({onClose }) => {
+    const [imageToEdit, setImageToEdit] = useState<string>("");
 
     return ( 
         <div className='image-manager-container default-window-theme'>
@@ -18,8 +19,8 @@ export const ImageManager: FunctionComponent<Props> = ({onClose }) => {
                 <label className='default-button-theme close-window-button' onClick={onClose}>X</label>
             </div>
             <div className='image-manager-view'>
-                <ImagePicker/>
-                <ImageEditor/>
+                <ImagePicker setImageToEdit={setImageToEdit}/>
+                <ImageEditor openImage={imageToEdit}/>
             </div>
         </div>
     )

@@ -4,14 +4,23 @@ import { appGlobals, SUPPORTED_FORMATS } from '../system/appGlobals'
 
 type Props = {
     imageName: string
+    setImageToEdit: (imageName: string) => void;
 }
 
-export const Image: FunctionComponent<Props> = ({ imageName }) => {
+export const Image: FunctionComponent<Props> = ({ imageName, setImageToEdit }) => {
     const imgRef = useRef<HTMLImageElement>(null);
+
+    function setImage( imageURL: string ) {
+        (imgRef.current as HTMLImageElement).src = imageURL;
+    }
+
+    function imageOnClick() {
+        setImageToEdit(imageName)
+    }
 
     useEffect(() => {
         if (appGlobals.imagesCache.has(imageName)) {
-            (imgRef.current as HTMLImageElement).src = appGlobals.imagesCache.get(imageName) as string;
+            setImage(appGlobals.imagesCache.get(imageName) as string);
         } else {
             appGlobals.system?.getFileSystem().downloadFile(imageName)
                 .then((result) => {
@@ -24,14 +33,14 @@ export const Image: FunctionComponent<Props> = ({ imageName }) => {
                     }
 
                     const urlObject = URL.createObjectURL(result.file.content);
-                    imgRef.current.src = urlObject;
+                    setImage( urlObject );
                     appGlobals.imagesCache.set(imageName, urlObject);
                 }
                 )
         }
     }, []);
     return ( 
-    <div className='image-container'>
+    <div className='image-container' onClick={imageOnClick}>
         <img ref={imgRef} src="tmp_image.svg" className='image-main' style={{fill: 'white'}}/>
     </div>
     )

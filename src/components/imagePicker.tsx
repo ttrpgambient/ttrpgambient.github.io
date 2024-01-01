@@ -1,27 +1,19 @@
 import './css/imagePicker.css'
 import { TagsInput } from './tagsInput'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, FunctionComponent } from 'react'
 import { appGlobals } from '../system/appGlobals';
 import { Image } from './image';
 
-export function ImagePicker() {
+type Props = {
+    setImageToEdit: (imageName: string) => void;
+}
+
+export const ImagePicker: FunctionComponent<Props> = ({setImageToEdit}) => {
     const [imageList, setImageList] = useState<string[]>([])
     const [tagsListState, setTagsListState] = useState<string[]>([]);
 
     const imageTagList = useRef<string[]>([]);
     const imageEmptyTagList = useRef<string[]>([]);
-
-    function ImagesGrid() {
-        let images: JSX.Element[] = [];
-        
-        for ( let image of imageList ) {
-            images.push(
-                <Image key={image} imageName={image}/>
-            )
-        }
-
-        return images;
-    }
 
     function getAllImagesWithTags(imageList: string[]) {
         imageTagList.current = imageList;
@@ -53,6 +45,18 @@ export function ImagePicker() {
             appGlobals.idbTagsImages.getAllImagesWithTags( tagsListState, getAllImagesWithTags );
         }
     }, [tagsListState])
+
+    function ImagesGrid() {
+        let images: JSX.Element[] = [];
+        
+        for ( let image of imageList ) {
+            images.push(
+                <Image key={image} imageName={image} setImageToEdit={setImageToEdit}/>
+            )
+        }
+
+        return images;
+    }
 
     return (
         <div className='image-picker-container default-window-theme'>
