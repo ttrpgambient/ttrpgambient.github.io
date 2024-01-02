@@ -11,12 +11,12 @@ export const Image: FunctionComponent<Props> = ({ imageName, setImageToEdit }) =
     const imgRef = useRef<HTMLImageElement>(null);
     const canBeSelected = useRef<boolean>(false)
 
-    function setImage( imageURL: string ) {
+    function setImage(imageURL: string) {
         (imgRef.current as HTMLImageElement).src = imageURL;
     }
 
     function imageOnClick() {
-        if ( canBeSelected.current )
+        if (canBeSelected.current)
             setImageToEdit(imageName)
     }
 
@@ -36,16 +36,16 @@ export const Image: FunctionComponent<Props> = ({ imageName, setImageToEdit }) =
                     }
 
                     const urlObject = URL.createObjectURL(result.file.content);
-                    setImage( urlObject );
+                    setImage(urlObject);
                     appGlobals.imagesCache.set(imageName, urlObject);
                     canBeSelected.current = true;
                 }
                 )
         }
     }, []);
-    return ( 
-    <div className='image-container' onClick={imageOnClick}>
-        <img ref={imgRef} src="tmp_image.svg" className='image-main' style={{fill: 'white'}}/>
-    </div>
+    return (
+        <div className='image-container' onClick={imageOnClick}>
+            <img ref={imgRef} src="tmp_image.svg" className='image-main' style={{ fill: 'white' }} />
+        </div>
     )
 }
