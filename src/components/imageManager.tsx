@@ -24,7 +24,7 @@ export const ImageManager: FunctionComponent<Props> = ({onClose }) => {
                 <label className='default-button-theme close-window-button' onClick={onClose}>X</label>
             </div>
             <div className='image-manager-view'>
-                <ImagePicker managerVersion={managerVersion} setImageToEdit={setImageToEdit}/>
+                <ImagePicker managerVersion={managerVersion} imageToEdit={imageToEdit} setImageToEdit={setImageToEdit}/>
                 <ImageEditor updateManagerVersion={updateManagerVersion} setImageToEdit={setImageToEdit} openImageName={imageToEdit}/>
             </div>
         </div>
