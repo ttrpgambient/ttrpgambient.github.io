@@ -86,6 +86,21 @@ export class IDBTagsImages {
         }
     }
 
+    removeImage( imageName: string ) {
+        const tags = this.idb.get()
+            .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
+            .objectStore(DB_TAG_TO_IMAGE_STORE)
+            .index(DB_IMAGE);
+
+        tags.openCursor(IDBKeyRange.only(imageName)).onsuccess = (e) => {
+            const cursor = (e.target as IDBRequest<IDBCursorWithValue | null>).result;
+            if (cursor) {
+                cursor.delete();
+                cursor.continue();
+            }
+        }
+    }
+
     getAllTags(callback: (tagsList: string[]) => void) {
         const index = this.idb.get()
             .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')

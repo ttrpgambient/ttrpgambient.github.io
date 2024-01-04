@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
 import './css/imageManager.css';
 import './css/common.css';
@@ -7,10 +7,11 @@ import { ImagePicker } from './imagePicker';
 import { ImageEditor } from './imageEditor';
 
 type Props = {
+    imagesToDelete?: string[];
     onClose: () => void;
 }
 
-export const ImageManager: FunctionComponent<Props> = ({onClose }) => {
+export const ImageManager: FunctionComponent<Props> = ({imagesToDelete, onClose }) => {
     const [imageToEdit, setImageToEdit] = useState<string>("");
     const [managerVersion, setManagerVersion] = useState<number>(0);
 
@@ -24,7 +25,7 @@ export const ImageManager: FunctionComponent<Props> = ({onClose }) => {
                 <label className='default-button-theme close-window-button' onClick={onClose}>X</label>
             </div>
             <div className='image-manager-view'>
-                <ImagePicker managerVersion={managerVersion} imageToEdit={imageToEdit} setImageToEdit={setImageToEdit}/>
+                <ImagePicker managerVersion={managerVersion} imageToEdit={imageToEdit} setImageToEdit={setImageToEdit} imagesToDelete={imagesToDelete}/>
                 <ImageEditor updateManagerVersion={updateManagerVersion} setImageToEdit={setImageToEdit} openImageName={imageToEdit}/>
             </div>
         </div>

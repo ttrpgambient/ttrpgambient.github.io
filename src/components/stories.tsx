@@ -1,10 +1,11 @@
-import {useState, FunctionComponent} from 'react';
+import {useState, FunctionComponent, useRef} from 'react';
 
 import './css/stories.css';
 import { SceneView } from './sceneView'
 import { ImageManager } from './imageManager';
 
 import { authGlobal, AUTH_DISABLED } from '../system/authentication';
+import { appGlobals } from '../system/appGlobals';
 
 type Props = {
     changeAuthButtonState: (state: number) => void;
@@ -13,18 +14,30 @@ type Props = {
 export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
     const [showImageManager, setShowImageManager] = useState(false);
 
+    const imagesToDelete = useRef<string[]>([]);
+
 
     const handleLogOutClick = () => {
           authGlobal.logout().then( () => { changeAuthButtonState(AUTH_DISABLED) } );
       };
     
       const handleImageManagerClick = () => {
+        if ( showImageManager && imagesToDelete ) {
+        for ( let image of imagesToDelete.current ) {
+                appGlobals.idbTagsImages.removeImage(image);
+                appGlobals.imagesCache.delete(image);
+                appGlobals.system?.getFileSystem().deleteFile(image);
+            }
+
+            imagesToDelete.current.length = 0;
+        }
+
         setShowImageManager(!showImageManager)
       }
 
     function RenderImageManager() {
         if ( showImageManager )
-            return <ImageManager onClose={handleImageManagerClick}/>
+            return <ImageManager imagesToDelete={imagesToDelete.current} onClose={handleImageManagerClick}/>
     }
 
     return (

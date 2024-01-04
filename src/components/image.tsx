@@ -1,16 +1,18 @@
 import './css/image.css'
-import { FunctionComponent, useEffect, useRef } from 'react'
+import { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { appGlobals, SUPPORTED_FORMATS } from '../system/appGlobals'
 
 type Props = {
     imageName: string;
     imageToEdit: string;
     setImageToEdit: (imageName: string) => void;
+    imagesToDelete?: string[]
 }
 
-export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setImageToEdit }) => {
+export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setImageToEdit, imagesToDelete }) => {
     const imgRef = useRef<HTMLImageElement>(null);
     const canBeSelected = useRef<boolean>(false)
+    const [markedForDelete, setMarkedForDelete] = useState<boolean>(false)
 
     function setImage(imageURL: string) {
         (imgRef.current as HTMLImageElement).src = imageURL;
@@ -45,10 +47,34 @@ export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setIma
         }
     }, []);
 
-    const imageClass = (imageToEdit === imageName) ? "image-container image-container-selected" : "image-container image-container-not-selected";
+    
+    function onDelete( e: React.MouseEvent<HTMLLabelElement> ) {
+        e.stopPropagation();
+        if ( !imagesToDelete ) return;
+
+        const imageToDeleteIndex = imagesToDelete.indexOf(imageName);
+        if ( imageToDeleteIndex == -1 ) {
+            setMarkedForDelete( true );
+            imagesToDelete.push(imageName);
+        } else {
+            setMarkedForDelete( false );
+            imagesToDelete[imageToDeleteIndex] = imagesToDelete[imagesToDelete.length-1];
+            imagesToDelete.length -= 1;
+        }
+
+    }
+    
+    // Logic
+    let imageClass = "image-container image-container-not-selected";
+    if ( imageToEdit === imageName ) {
+        imageClass = "image-container image-container-selected"
+    } else if ( markedForDelete ) {
+        imageClass = "image-container image-container-delete"
+    }
 
     return (
         <div className={imageClass} onClick={imageOnClick}>
+            <label className='default-button-theme close-window-button' onClick={onDelete}>X</label>
             <img ref={imgRef} src="tmp_image.svg" className='image-main' style={{ fill: 'white' }} />
         </div>
     )

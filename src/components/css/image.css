@@ -14,6 +14,11 @@
 }
 
 .image-container-selected {
+    border: 2px solid green;
+    opacity: 1.0;
+}
+
+.image-container-delete {
     border: 2px solid red;
     opacity: 1.0;
 }

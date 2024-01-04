@@ -8,9 +8,10 @@ type Props = {
     managerVersion: number;
     imageToEdit: string;
     setImageToEdit: (imageName: string) => void;
+    imagesToDelete?: string[];
 }
 
-export const ImagePicker: FunctionComponent<Props> = ({managerVersion, imageToEdit, setImageToEdit}) => {
+export const ImagePicker: FunctionComponent<Props> = ({managerVersion, imageToEdit, setImageToEdit, imagesToDelete}) => {
     const [imageList, setImageList] = useState<string[]>([])
     const [tagsListState, setTagsListState] = useState<string[]>([]);
 
@@ -53,7 +54,7 @@ export const ImagePicker: FunctionComponent<Props> = ({managerVersion, imageToEd
         
         for ( let image of imageList ) {
             images.push(
-                <Image key={image} imageName={image} imageToEdit={imageToEdit} setImageToEdit={setImageToEdit}/>
+                <Image key={image} imageName={image} imageToEdit={imageToEdit} setImageToEdit={setImageToEdit} imagesToDelete={imagesToDelete}/>
             )
         }
 

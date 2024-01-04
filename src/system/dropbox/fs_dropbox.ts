@@ -8,6 +8,7 @@ import {
     DownloadResult,
     FileInfo,
     FileUploadMode,
+    DeleteResults as DeleteResult,
 } from '../../interfaces/system/fs_interface';
 
 function HandleLookupError(path: string, lookupError: DropboxAPI.files.LookupError) {
@@ -27,6 +28,26 @@ function HandleDownloadError(path: string, downloadError: DropboxAPI.files.Downl
         case 'path': //DownloadErrorPath
             try {
                 HandleLookupError(path, downloadError.path);
+            } catch (error: any) {
+                if (!!error.error.status) {
+                    switch (error.error.status) {
+                        case FileSystemStatus.NotFound:
+                            return FileSystemStatus.NotFound;
+                    }
+                }
+                throw error;
+            }
+            return FileSystemStatus.Unknown;
+        default:
+            throw DropboxError('Unsupported DownloadError type. File: ' + path);
+    }
+}
+
+function HandleDeleteError(path: string, deleteError: DropboxAPI.files.DeleteError): FileSystemStatus {
+    switch (deleteError['.tag']) {
+        case 'path_lookup': //DeleteErrorPathLookup
+            try {
+                HandleLookupError(path, deleteError.path_lookup);
             } catch (error: any) {
                 if (!!error.error.status) {
                     switch (error.error.status) {
@@ -321,5 +342,21 @@ export class DropboxFS implements FileSystem {
             });
         }
         return fileMeta.content_hash;
+    }
+    
+    async deleteFile(path: string): Promise<DeleteResult> {
+        try {
+            await this.dbx.filesDeleteV2({ path: path });
+        } catch (error: any) {
+            var deleteError = error.error;
+            if (!!!deleteError.error) {
+                throw DropboxError(deleteError);
+            }
+            return { status: HandleDeleteError(path, deleteError.error) }; // promise returns DropboxResponseError<Error<files.DownloadError>> (there is a mistake in index.d.ts)
+        }
+
+        let result: DeleteResult = new DeleteResult();
+        result.status = FileSystemStatus.Success;
+        return result;
     }
 }
