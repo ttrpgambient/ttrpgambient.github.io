@@ -7,9 +7,10 @@ type Props = {
     imageToEdit: string;
     setImageToEdit: (imageName: string) => void;
     imagesToDelete?: string[]
+    markEditorToDelete?: (willDelete: boolean) => void;
 }
 
-export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setImageToEdit, imagesToDelete }) => {
+export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setImageToEdit, imagesToDelete, markEditorToDelete }) => {
     const imgRef = useRef<HTMLImageElement>(null);
     const canBeSelected = useRef<boolean>(false)
     const [markedForDelete, setMarkedForDelete] = useState<boolean>(false)
@@ -19,11 +20,53 @@ export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setIma
     }
 
     function imageOnClick() {
-        if (canBeSelected.current)
+        if (canBeSelected.current) {
             setImageToEdit(imageName)
+            if ( imagesToDelete && markEditorToDelete ){
+                const imageToDeleteIndex = imagesToDelete.indexOf(imageName);
+                if ( imageToDeleteIndex != -1 ) {
+                    markEditorToDelete( true );
+                } else {
+                    markEditorToDelete( false );
+                }
+            }
+        }
     }
+    
+    function deleteOnClick( e: React.MouseEvent<HTMLLabelElement> ) {
+        e.stopPropagation();
+        if ( !imagesToDelete ) return;
 
+        const imageToDeleteIndex = imagesToDelete.indexOf(imageName);
+        if ( imageToDeleteIndex == -1 ) {
+            setMarkedForDelete( true );
+            imagesToDelete.push(imageName);
+
+            if ( imageName === imageToEdit && markEditorToDelete ) {
+                markEditorToDelete(true);
+            }
+
+        } else {
+            setMarkedForDelete( false );
+            imagesToDelete[imageToDeleteIndex] = imagesToDelete[imagesToDelete.length-1];
+            imagesToDelete.length -= 1;
+
+            if ( imageName === imageToEdit && markEditorToDelete ) {
+                markEditorToDelete(false);
+            }
+        }
+
+    }
+    
+    // Logic
     useEffect(() => {
+        if ( imagesToDelete ){
+            const imageToDeleteIndex = imagesToDelete.indexOf(imageName);
+            if ( imageToDeleteIndex != -1 ) {
+                setMarkedForDelete( true );
+            } 
+        }
+
         if (appGlobals.imagesCache.has(imageName)) {
             setImage(appGlobals.imagesCache.get(imageName) as string);
             canBeSelected.current = true;
@@ -47,24 +90,6 @@ export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setIma
         }
     }, []);
 
-    
-    function onDelete( e: React.MouseEvent<HTMLLabelElement> ) {
-        e.stopPropagation();
-        if ( !imagesToDelete ) return;
-
-        const imageToDeleteIndex = imagesToDelete.indexOf(imageName);
-        if ( imageToDeleteIndex == -1 ) {
-            setMarkedForDelete( true );
-            imagesToDelete.push(imageName);
-        } else {
-            setMarkedForDelete( false );
-            imagesToDelete[imageToDeleteIndex] = imagesToDelete[imagesToDelete.length-1];
-            imagesToDelete.length -= 1;
-        }
-
-    }
-    
-    // Logic
     let imageClass = "image-container image-container-not-selected";
     if ( imageToEdit === imageName ) {
         imageClass = "image-container image-container-selected"
@@ -74,7 +99,7 @@ export const Image: FunctionComponent<Props> = ({ imageName, imageToEdit, setIma
 
     return (
         <div className={imageClass} onClick={imageOnClick}>
-            <label className='default-button-theme close-window-button' onClick={onDelete}>X</label>
+            <label className='default-button-theme close-window-button' onClick={deleteOnClick}>X</label>
             <img ref={imgRef} src="tmp_image.svg" className='image-main' style={{ fill: 'white' }} />
         </div>
     )

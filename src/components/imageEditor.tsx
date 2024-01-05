@@ -13,9 +13,11 @@ type Props = {
     updateManagerVersion: () => void;
     setImageToEdit: (imageName: string) => void;
     openImageName?: string
+    markedToDelete?: boolean;
+    markToDelete?: (willDelete: boolean) => void;
 }
 
-export const ImageEditor: FunctionComponent<Props> = ({updateManagerVersion, setImageToEdit, openImageName}) => {
+export const ImageEditor: FunctionComponent<Props> = ({updateManagerVersion, setImageToEdit, openImageName, markedToDelete, markToDelete}) => {
 
     const imgElement = useRef<HTMLImageElement>(null);
     const [imgName, setImgName] = useState<string>("");
@@ -41,6 +43,7 @@ export const ImageEditor: FunctionComponent<Props> = ({updateManagerVersion, set
                 const name = result.fileInfo.name as string;
                 setImgName( name );
                 setImageToEdit("")
+                if ( markToDelete ) markToDelete(false);
                 appGlobals.idbTagsImages.addRecord("", name, () => {
                     appGlobals.imagesCache.set(name, fileURL);
                     updateManagerVersion();
@@ -156,6 +159,8 @@ export const ImageEditor: FunctionComponent<Props> = ({updateManagerVersion, set
         }
     }, [openImageName]);
 
+    const imageClass = (markedToDelete === undefined || !markedToDelete)  ? "image-editor-img" : "image-editor-img image-editor-img-delete"
+
     return (
         <div className='image-editor-container default-window-theme'>
             <TagsInput onTagSelect={onTagSelect} onTagDeselect={onTagDeselect} disabled={imgName === ""} usedTags={tags}/>
@@ -171,7 +176,7 @@ export const ImageEditor: FunctionComponent<Props> = ({updateManagerVersion, set
             />
 
             <div className='image-editor-drop' style={{backgroundColor: DROP_DEFAULT_COLOR}} onDragEnter={onDragEnter} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
-                <img src="add_image.svg" className='image-editor-img' ref={imgElement} />
+                <img src="add_image.svg" className={imageClass} ref={imgElement} />
             </div>
         </div>
     )

@@ -13,3 +13,7 @@
     translate: -50% 0%;
     width: 99%;
 }
+
+.image-editor-img-delete {
+    border: 2px solid red;
+}

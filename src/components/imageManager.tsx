@@ -14,6 +14,7 @@ type Props = {
 export const ImageManager: FunctionComponent<Props> = ({imagesToDelete, onClose }) => {
     const [imageToEdit, setImageToEdit] = useState<string>("");
     const [managerVersion, setManagerVersion] = useState<number>(0);
+    const [editorMarkedToDelete, setEditorMarkedToDelete] = useState<boolean>(false);
 
     function updateManagerVersion() {
         setManagerVersion(current => current + 1);
@@ -25,8 +26,8 @@ export const ImageManager: FunctionComponent<Props> = ({imagesToDelete, onClose 
                 <label className='default-button-theme close-window-button' onClick={onClose}>X</label>
             </div>
             <div className='image-manager-view'>
-                <ImagePicker managerVersion={managerVersion} imageToEdit={imageToEdit} setImageToEdit={setImageToEdit} imagesToDelete={imagesToDelete}/>
-                <ImageEditor updateManagerVersion={updateManagerVersion} setImageToEdit={setImageToEdit} openImageName={imageToEdit}/>
+                <ImagePicker managerVersion={managerVersion} imageToEdit={imageToEdit} setImageToEdit={setImageToEdit} imagesToDelete={imagesToDelete} markEditorToDelete={setEditorMarkedToDelete}/>
+                <ImageEditor updateManagerVersion={updateManagerVersion} setImageToEdit={setImageToEdit} openImageName={imageToEdit} markedToDelete={editorMarkedToDelete} markToDelete={setEditorMarkedToDelete}/>
             </div>
         </div>
     )
