@@ -1,15 +1,19 @@
 .image-editor-container {
+    
 }
 
 .image-editor-drop {
-    width: 99%;
-    height: auto;
+    margin: 5%;
     border: 1px solid #000000;
 }
 
 .image-editor-img {
     position: relative;
     left: 50%;
-    translate: -50% 1%;
+    translate: -50% 0%;
     width: 99%;
+}
+
+.image-editor-img-delete {
+    border: 2px solid red;
 }

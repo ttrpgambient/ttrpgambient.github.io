@@ -27,9 +27,14 @@ export class DownloadResult {
     file?: File;
     fileInfo?: FileInfo;
 }
+export class DeleteResults {
+    status: FileSystemStatus = FileSystemStatus.Unknown;
+}
+
 export interface FileSystem {
     calculateFileHash(file: File): Promise<string>;
     getFileHash(path: string): Promise<string>; // return file's hash from server as string
     uploadFile(path: string, file: File, mode: FileUploadMode): Promise<UploadResult>;
     downloadFile(path: string): Promise<DownloadResult>;
+    deleteFile(path: string): Promise<DeleteResults>;
 }

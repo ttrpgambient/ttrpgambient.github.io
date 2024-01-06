@@ -1,0 +1,13 @@
+.image-picker-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.image-picker-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
+    gap: 10px;
+    overflow-y: auto;
+    height: 90%;
+}

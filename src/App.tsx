@@ -5,14 +5,24 @@ import { WelcomeScreen } from './components/welcomeScreen';
 import { Stories } from './components/stories';
 
 import { authGlobal, AUTH_DISABLED, AUTH_LOGIN, AUTH_LOGOUT } from './system/authentication';
+import { appGlobals } from './system/appGlobals';
 
 function App() {
   const [authButtonState, setAuthButtonState] = useState(AUTH_DISABLED);
+
+  function createTagsArray(tagsList: string[]) {
+    appGlobals.tags = tagsList;
+  }
 
   useEffect(() => {
     if (authButtonState === AUTH_DISABLED) {
       authGlobal.tryAuthentication().then((loggedIn) => {
         setAuthButtonState(loggedIn ? AUTH_LOGOUT : AUTH_LOGIN);
+        if ( loggedIn ) {
+          appGlobals.idbTagsImages.loadDB().then(() => {
+            appGlobals.idbTagsImages.getAllTags(createTagsArray)
+          })
+        }
       });
     }
   }, [authButtonState]); 
