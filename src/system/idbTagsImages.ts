@@ -1,4 +1,4 @@
-import { DownloadResult, FileSystemStatus, FileUploadMode, UploadResult } from "../interfaces/system/fs_interface";
+import { FileSystemStatus, FileUploadMode, UploadResult } from "../interfaces/system/fs_interface";
 import { appGlobals } from "./appGlobals";
 import { IDBObject, IDBObjectStoreHelper } from "./idb_core";
 
