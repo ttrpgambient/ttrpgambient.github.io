@@ -19,7 +19,9 @@ function App() {
       authGlobal.tryAuthentication().then((loggedIn) => {
         setAuthButtonState(loggedIn ? AUTH_LOGOUT : AUTH_LOGIN);
         if ( loggedIn ) {
-          appGlobals.idbTagsImages.getAllTags(createTagsArray)
+          appGlobals.idbTagsImages.loadDB().then(() => {
+            appGlobals.idbTagsImages.getAllTags(createTagsArray)
+          })
         }
       });
     }

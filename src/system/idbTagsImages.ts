@@ -1,5 +1,8 @@
+import { DownloadResult, FileSystemStatus, FileUploadMode, UploadResult } from "../interfaces/system/fs_interface";
+import { appGlobals } from "./appGlobals";
 import { IDBObject, IDBObjectStoreHelper } from "./idb_core";
 
+const DB_NAME = "/tagsImages.db"
 const DB_VERSION = 1;
 const DB_TAG_TO_IMAGE = 'TAG_TO_IMAGE_DB';
 const DB_TAG_TO_IMAGE_STORE = 'TAG_TO_IMAGE_STORE';
@@ -42,6 +45,59 @@ export class IDBTagsImages {
         this.idb = new IDBObject(DB_TAG_TO_IMAGE, DB_VERSION, objectStore);
     }
 
+    async loadDB() {
+        const dbHash = window.localStorage.getItem(DB_NAME);
+        if ( !!dbHash ) {
+            const serverHash = await appGlobals.system?.getFileSystem().getFileHash(DB_NAME);
+            if ( dbHash !== serverHash) {
+                const result = await appGlobals.system?.getFileSystem().downloadFile(DB_NAME);
+                if (!!!result) {
+                    throw Error('loadDB tagsImages: no result from download');
+                }
+                if (result.status !== FileSystemStatus.Success) {
+                    throw Error('Local hash exists. Couldnt download db, status: ' + result.status);
+                }
+                const dbJson = await result.file?.content?.text();
+                if (!!!dbJson) {
+                    throw Error('loadDB tagsImages: db downloaded but no text');
+                }
+                await this.idb.delete();
+                await this.idb.import(dbJson);
+            }
+        } else {
+            const result = await appGlobals.system?.getFileSystem().downloadFile(DB_NAME);
+            if (!!!result) {
+                throw Error('loadDB tagsImages: no result from download');
+            }
+            if (result.status === FileSystemStatus.Success) {
+                if (!!!result.fileInfo?.hash)
+                    throw Error('loadDB tagsImages: Local hash doesnt exists. No hash in downloaded db');
+
+                window.localStorage.setItem(DB_NAME, result.fileInfo.hash);
+
+                const dbJson = await result.file?.content?.text();
+                if (!!!dbJson) {
+                    throw Error('loadDB tagsImages: db downloaded but no text');
+                }
+                await this.idb.delete();
+                await this.idb.import(dbJson);
+            }
+        }
+    }
+
+    private uploadDB() {
+        this.idb.export().then( (jsonDB: string) => {
+            appGlobals.system?.getFileSystem().uploadFile(DB_NAME, {content: new Blob([jsonDB])}, FileUploadMode.Replace).then((result: UploadResult) => {
+                if (!!!result) throw Error('uploadDB tagsImages: no result');
+                if (result.status !== FileSystemStatus.Success) throw Error('Couldnt upload db, status: ' + result.status);
+                if (!!!result.fileInfo) throw Error('uploadDB tagsImages: No fileInfo');
+                if (!!!result.fileInfo.hash) throw Error('uploadDB tagsImages: No hash');
+
+                window.localStorage.setItem(DB_NAME, result.fileInfo.hash);
+            });
+        });
+    }
+
     addRecord(tagName: string, imageName: string, callback?: ()=>void) {
         const index = this.idb.get()
             .transaction(DB_TAG_TO_IMAGE_STORE, 'readonly')
@@ -63,7 +119,10 @@ export class IDBTagsImages {
                 this.idb.get()
                     .transaction(DB_TAG_TO_IMAGE_STORE, 'readwrite')
                     .objectStore(DB_TAG_TO_IMAGE_STORE)
-                    .add(record).onsuccess = () => {if (callback) callback()};
+                    .add(record).onsuccess = () => {
+                        if (callback) callback()
+                        this.uploadDB();
+                    };
             }
         }
     }
@@ -79,6 +138,7 @@ export class IDBTagsImages {
             if (cursor) {
                 if (imageName === cursor.value.imageName) {
                     cursor.delete();
+                    this.uploadDB();
                     return;
                 }
                 cursor.continue();
@@ -97,6 +157,8 @@ export class IDBTagsImages {
             if (cursor) {
                 cursor.delete();
                 cursor.continue();
+            } else {
+                this.uploadDB();
             }
         }
     }
