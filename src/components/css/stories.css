@@ -1,6 +1,9 @@
 .stories-main-container {
+  position: relative;
+  height: 100%;
   display: grid;
   grid-template-columns: 40% 60%;
+  overflow: hidden;
 }
 
 .stories-display-container {
@@ -9,6 +12,12 @@
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+}
+
+.stories-controls-container {
+  position: relative;
+  height: 95%;
+  overflow-y: scroll;
 }
 
 .stories-settings-button {

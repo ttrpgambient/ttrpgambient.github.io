@@ -13,6 +13,7 @@ type Props = {
 
 export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
     const [showImageManager, setShowImageManager] = useState(false);
+    const [sceneList, setSceneList] = useState<JSX.Element[]>([]);
 
     const imagesToDelete = useRef<string[]>([]);
 
@@ -40,8 +41,12 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
             return <ImageManager imagesToDelete={imagesToDelete.current} onClose={handleImageManagerClick}/>
     }
 
+    function addScene() {
+        setSceneList(sceneList.concat(<SceneView key={sceneList.length}/>))
+    }
+
     return (
-        <div>
+        <div style={{height:"100%"}}>
             <div className='stories-settings-bar'>
                 <button type='button' className='stories-settings-button' onClick={handleLogOutClick}>Log Out</button> 
                 <button type='button' className='stories-settings-button' onClick={handleImageManagerClick}>Image Manager</button>
@@ -49,8 +54,8 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
             <div className='stories-main-container'>
                 <div className='stories-display-container'>Display</div>
                 <div className='stories-controls-container'>
-                    <SceneView/>
-                    <SceneView/>
+                    {sceneList}
+                    <button type='button' onClick={addScene}>Add Scene</button>
                 </div>
             </div>
             <RenderImageManager/>
