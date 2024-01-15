@@ -6,6 +6,7 @@ import { ImageManager } from './imageManager';
 
 import { authGlobal, AUTH_DISABLED } from '../system/authentication';
 import { appGlobals } from '../system/appGlobals';
+import { Story } from './story';
 
 type Props = {
     changeAuthButtonState: (state: number) => void;
@@ -16,7 +17,7 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
     const [sceneList, setSceneList] = useState<JSX.Element[]>([]);
 
     const imagesToDelete = useRef<string[]>([]);
-
+    const storiesTitles = useRef<Set<string>>(new Set<string>())
 
     const handleLogOutClick = () => {
           authGlobal.logout().then( () => { changeAuthButtonState(AUTH_DISABLED) } );
@@ -41,8 +42,24 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
             return <ImageManager imagesToDelete={imagesToDelete.current} onClose={handleImageManagerClick}/>
     }
 
-    function addScene() {
-        setSceneList(sceneList.concat(<SceneView key={sceneList.length}/>))
+    function checkTitle(title: string): string {
+        if ( storiesTitles.current.has(title) ) {
+            title = title + " new";
+            return checkTitle(title);
+        }
+
+        storiesTitles.current.add(title);
+        return title;
+    }
+
+    function titleChanged( titleOld: string, titleNew: string ): string {
+        storiesTitles.current.delete(titleOld);
+        return checkTitle(titleNew);
+    }
+
+    function addStory() {
+        const title = checkTitle("Story");
+        setSceneList(sceneList.concat(<Story key={sceneList.length} title={title} titleChanged={titleChanged}/>))
     }
 
     return (
@@ -55,7 +72,7 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
                 <div className='stories-display-container'>Display</div>
                 <div className='stories-controls-container'>
                     {sceneList}
-                    <button type='button' onClick={addScene}>Add Scene</button>
+                    <button type='button' onClick={addStory}>Add Story</button>
                 </div>
             </div>
             <RenderImageManager/>

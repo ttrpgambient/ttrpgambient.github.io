@@ -1,0 +1,15 @@
+.story-container{
+    border: 2px solid #000;
+    border-radius: 3px;
+    width: auto;
+    display: block;
+    flex-wrap: wrap;
+}
+
+.story-title{
+    width: 40%;
+    margin-left: 10px;
+    font-size: large;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
