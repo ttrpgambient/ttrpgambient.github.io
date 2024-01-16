@@ -1,10 +1,12 @@
 import { FunctionComponent, KeyboardEvent, useRef } from 'react';
 import './css/story.css';
 type Props = {
+    storyKey: number;
     title: string;
     titleChanged: ( titleOld: string, titleNew: string ) => string;
+    removeStory: (key: number, title: string) => void;
 }
-export const Story: FunctionComponent<Props> = ({title, titleChanged}) => {
+export const Story: FunctionComponent<Props> = ({storyKey, title, titleChanged, removeStory}) => {
     const titleRef = useRef<HTMLInputElement>(null);
 
     function onKeyDown(e: KeyboardEvent<HTMLInputElement>){
@@ -24,7 +26,7 @@ export const Story: FunctionComponent<Props> = ({title, titleChanged}) => {
     return (
         <div className="story-container">
             <input autoFocus ref={titleRef} className="story-title" type="text" id="title" name="title" placeholder='Title' defaultValue={title} onKeyDown={onKeyDown} onBlur={onBlur}/>
-            <button type='button'>Edit</button>
+            <button type='button' onClick={()=>removeStory(storyKey, title)}>Remove</button>
         </div>
     )
 }

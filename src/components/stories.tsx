@@ -15,6 +15,8 @@ type Props = {
 export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
     const [showImageManager, setShowImageManager] = useState(false);
     const [sceneList, setSceneList] = useState<JSX.Element[]>([]);
+    const sceneKey = useRef<number>(0);
+    const sceneKeys = useRef<number[]>([]);
 
     const imagesToDelete = useRef<string[]>([]);
     const storiesTitles = useRef<Set<string>>(new Set<string>())
@@ -57,9 +59,22 @@ export const Stories: FunctionComponent<Props> = ({changeAuthButtonState}) => {
         return checkTitle(titleNew);
     }
 
+    function removeStory(key: number, title: string) {
+        const keyIndex = sceneKeys.current.indexOf(key);
+        if ( keyIndex === -1 ){
+            throw Error('Remove Story invalid Key!');
+        }
+
+        sceneKeys.current = [...sceneKeys.current.slice(0, keyIndex), ...sceneKeys.current.slice(keyIndex+1)];
+        setSceneList((current) => [...current.slice(0, keyIndex), ...current.slice(keyIndex+1)]);
+        storiesTitles.current.delete(title);
+    }
+
     function addStory() {
         const title = checkTitle("Story");
-        setSceneList(sceneList.concat(<Story key={sceneList.length} title={title} titleChanged={titleChanged}/>))
+        sceneKeys.current.push(sceneKey.current);
+        setSceneList(sceneList.concat(<Story key={sceneKey.current} storyKey={sceneKey.current} title={title} titleChanged={titleChanged} removeStory={removeStory}/>))
+        sceneKey.current += 1;
     }
 
     return (
